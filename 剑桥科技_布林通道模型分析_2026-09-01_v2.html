@@ -73,8 +73,9 @@
   <div class="panel" data-page-node-id="IxCNOvqxHB0MygBLuSFaw4">
     <h2 data-page-node-id="bw0ak1MAUpNIw7Rebb9wnh">日 K 线 × 布林通道</h2>
     <div class="toolbar" data-page-node-id="9ZFTGII69RUHBnAYtmitzA">
-      <button data-r="60" data-page-node-id="z4jr0uKDlwPJtSKDmfzDSZ">近 60 交易日</button>
-      <button data-r="130" class="on" data-page-node-id="MAcmTlQgHqt0ebwqZFk7EY">近 130 交易日</button>
+      <button data-r="125" class="on" data-page-node-id="MAcmTlQgHqt0ebwqZFk7EY">近半年（125 日）</button>
+      <button data-r="252" class="on" data-page-node-id="MAcmTlQgHqt0ebwqZFk7EY">近一年（252 日）</button>
+      <button data-r="all" data-page-node-id="allbtn">全部</button>
       <div class="legend" data-page-node-id="G93QBKLlnFhsVUMeZy8mR9">
         <span data-page-node-id="ncTAkKsL5s2P3b05hZBrT2"><i style="background:var(--u)" data-page-node-id="DTEbySRzq3dZln9d4M9vBL"></i>上轨/下轨</span>
         <span data-page-node-id="PEPYuMwAHptH9CJR0iCnYP"><i style="background:var(--m)" data-page-node-id="ZTYtQre1OG1qnauy9NyKMB"></i>中轨 MA20</span>
@@ -154,7 +155,11 @@ const VOL_UNIT = '万手'; // 成交量单位显示文案
 const CURRENCY = '元'; // 货币单位显示文案
 const cv = document.getElementById('chart'), ctx = cv.getContext('2d');
 const tip = document.getElementById('tip');
-let RANGE = 130, hoverIdx = -1;
+let RANGE = 252, hoverIdx = -1;
+(function(){
+  const ab = document.querySelector('button[data-r="all"]');
+  if (ab) ab.textContent = '全部（' + C.length + ' 日）';
+})();
 
 /* KPI */
 (function(){
@@ -440,7 +445,7 @@ document.querySelectorAll('.toolbar button').forEach(b => {
   b.addEventListener('click', () => {
     document.querySelectorAll('.toolbar button').forEach(x => x.classList.remove('on'));
     b.classList.add('on');
-    RANGE = parseInt(b.dataset.r, 10);
+    RANGE = b.dataset.r === 'all' ? C.length : parseInt(b.dataset.r, 10);
     hoverIdx = -1; tip.style.display = 'none';
     draw();
   });
