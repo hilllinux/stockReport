@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<html lang="zh-CN" data-page-node-id="jzTpHulVGTnONCSZQS1Zod">
+<head data-page-node-id="2pEsjOachDk1MMVJBj3L9h">
+<meta charset="UTF-8" data-page-node-id="ynGSgy5L7GVNeDGXybU3Hv">
+<meta name="viewport" content="width=device-width, initial-scale=1.0" data-page-node-id="qAVYyfYMYW0XXSdyz6A0I0">
 <title>StockReport · 股票分析报告库</title>
 <style>
   :root {
@@ -45,6 +45,28 @@
     border-radius: 999px;
     padding: 4px 14px;
   }
+  .online { margin-top: 14px; }
+  .online a {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #fff;
+    background: #1a9c57;
+    border-radius: 999px;
+    padding: 6px 16px;
+    text-decoration: none;
+    box-shadow: 0 2px 8px rgba(26, 156, 87, .25);
+    transition: opacity .15s ease, transform .15s ease;
+  }
+  .online a:hover { opacity: .88; transform: translateY(-1px); }
+  .online a .pulse {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: #bff5d4;
+    animation: blink 1.6s ease-in-out infinite;
+  }
+  @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: .35; } }
   .count-badge {
     display: inline-block;
     background: var(--accent);
@@ -142,30 +164,37 @@
   }
 </style>
 </head>
-<body>
-<div class="wrap">
-  <header>
-    <h1>StockReport<span class="dot">·</span>股票分析报告库</h1>
-    <p>布林通道（BOLL 20,2）模型分析报告 · 离线单文件 HTML · git 版本管理</p>
-    <div class="meta">
-      <span>共 <b id="count">3</b> 份报告</span>
-      <span>·</span>
-      <span>最近更新 2026-09-01</span>
+<body data-page-node-id="o9GSDoGnygMHgAMpQpOm7H">
+<div class="wrap" data-page-node-id="h2CCwK9MwrA1YqwKeAPFgc">
+  <header data-page-node-id="A56scH0CkykwJTJ4xA8Rs0">
+    <h1 data-page-node-id="KvnfCuH0398QKHUFaBMNyx">StockReport<span class="dot" data-page-node-id="JI6htK3aEfFxxmhKl9KX2f">·</span>股票分析报告库</h1>
+    <p data-page-node-id="VVU8gGkSvqWDJE65mqGAhA">布林通道（BOLL 20,2）模型分析报告 · 离线单文件 HTML · git 版本管理</p>
+    <div class="meta" data-page-node-id="T8KMmRByPkNNnJUEsHlfLB">
+      <span data-page-node-id="JhI5sOxg4v6dzmvzL1GB5l">共 <b id="count" data-page-node-id="n0TEBdpmJVDLzYiJXHnBs7">3</b> 份报告</span>
+      <span data-page-node-id="nVv3dE2cnHqRBQcDnuEq2C">·</span>
+      <span data-page-node-id="Ensw8MYbjXB2Bh8qvLLAjM">最近更新 2026-09-01</span>
+    </div>
+    <div class="online">
+      <a href="https://report.get-acrylic.com" target="_blank" rel="noopener">
+        <span class="pulse"></span>在线访问 report.get-acrylic.com
+      </a>
     </div>
   </header>
 
-  <section class="cards" id="cards">
+  <section class="cards" id="cards" data-page-node-id="pjlrJkOL9Vvh6oecU4C65W">
     <!-- 报告卡片由 JS 从数据源渲染 -->
   </section>
 
-  <div class="note">
-    <b>免责声明：</b>本库所有报告均为技术指标（布林通道/RSI/MFI 等）的统计与形态分析，不构成任何投资建议。市场有风险，决策需独立判断并自负盈亏。
+  <div class="note" data-page-node-id="biWXOq9Wv6ZEnWkHTVMo2v">
+    <b data-page-node-id="WCZpsX3cRVXn3hHJcwfzxy">免责声明：</b>本库所有报告均为技术指标（布林通道/RSI/MFI 等）的统计与形态分析，不构成任何投资建议。市场有风险，决策需独立判断并自负盈亏。
   </div>
 
-  <footer>
-    报告库维护于 <code>/Users/jason/Documents/Workbuddy/StockReport</code>
-    · 远程 <code>github.com/hilllinux/stockReport</code>
-    · 首次提交 <code>6e416c0</code>
+  <footer data-page-node-id="Sp7Q5a1eHllLZN6yxr3xWe">
+    在线访问 <a href="https://report.get-acrylic.com" style="color:#2f54eb;text-decoration:none;">report.get-acrylic.com</a>
+    · Cloudflare 托管，GitHub push 自动部署
+    <br data-page-node-id="KHx6tqmUwF0v3Jq6Rw5L3s">
+    本地 <code data-page-node-id="KgnohOAGrXQqU2pHKrJlfh">/Users/jason/Documents/Workbuddy/StockReport</code>
+    · 远程 <code data-page-node-id="AGK0Nxe7KCw9veuPI6YQbc">github.com/hilllinux/stockReport</code>
   </footer>
 </div>
 
