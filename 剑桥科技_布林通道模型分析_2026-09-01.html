@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-page-node-id="0IpQM3D66YgRiFq0WxFGaM">
+<head data-page-node-id="L5rBtmttNOjJWrDK2H41TS">
+<meta charset="utf-8" data-page-node-id="fd3N5GVEx0q9HFzXYnja9q">
+<meta name="viewport" content="width=device-width, initial-scale=1" data-page-node-id="WodxVFZmJjvgeuIDH8zcqF">
+<title>剑桥科技(603083.SH) 布林通道模型分析</title>
+<style>
+  :root{
+    --txt:#1f2733; --sub:#5a6676; --line:#e4e8ee; --bg:#f6f8fb; --card:#ffffff;
+    --up:#d93838; --down:#0a9d6c; --u:#5b7cff; --m:#e8961e; --l:#5b7cff;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    background:var(--bg); color:var(--txt); line-height:1.65; padding:28px 16px 40px;}
+  .wrap{max-width:1020px; margin:0 auto;}
+  header{border-left:4px solid var(--u); padding-left:14px; margin-bottom:18px;}
+  h1{font-size:22px; letter-spacing:.5px;}
+  .meta{font-size:12.5px; color:var(--sub); margin-top:4px;}
+  .kpis{display:grid; grid-template-columns:repeat(6,1fr); gap:10px; margin-bottom:18px;}
+  @media (max-width:760px){.kpis{grid-template-columns:repeat(3,1fr);}}
+  .kpi{background:var(--card); border:1px solid var(--line); border-radius:10px; padding:12px 12px 10px;}
+  .kpi .k{font-size:12px; color:var(--sub);}
+  .kpi .v{font-size:20px; font-weight:700; margin-top:2px; font-variant-numeric:tabular-nums;}
+  .kpi .s{font-size:11px; color:var(--sub); margin-top:1px;}
+  .panel{background:var(--card); border:1px solid var(--line); border-radius:12px;
+    padding:18px 18px 14px; margin-bottom:18px;}
+  .panel h2{font-size:16px; margin-bottom:10px; display:flex; align-items:center; gap:8px;}
+  .panel h2::before{content:""; width:8px; height:8px; border-radius:2px; background:var(--u); display:inline-block;}
+  .toolbar{display:flex; gap:8px; align-items:center; margin-bottom:10px; flex-wrap:wrap;}
+  .toolbar button{border:1px solid var(--line); background:#fff; color:var(--sub);
+    padding:4px 14px; border-radius:20px; font-size:13px; cursor:pointer;}
+  .toolbar button.on{background:var(--u); color:#fff; border-color:var(--u);}
+  .legend{display:flex; gap:14px; font-size:12px; color:var(--sub); flex-wrap:wrap;}
+  .legend i{display:inline-block; width:14px; height:3px; border-radius:2px; margin-right:4px; vertical-align:middle;}
+  #chart{width:100%; height:560px; display:block; cursor:crosshair;}
+  #tip{position:fixed; display:none; background:#fff; border:1px solid var(--line);
+    border-radius:8px; box-shadow:0 4px 16px rgba(20,30,50,.12); padding:8px 10px;
+    font-size:12px; pointer-events:none; z-index:10; font-variant-numeric:tabular-nums; white-space:nowrap;}
+  #tip b{font-weight:600;}
+  table{width:100%; border-collapse:collapse; font-size:13.5px;}
+  th,td{border-bottom:1px solid var(--line); padding:8px 6px; text-align:left;}
+  th{color:var(--sub); font-weight:600; font-size:12.5px;}
+  td.n{font-variant-numeric:tabular-nums;}
+  .pos{color:var(--up);} .neg{color:var(--down);}
+  .panel p{font-size:13.5px; margin-bottom:8px; color:#2a3342;}
+  .panel ul{padding-left:20px; font-size:13.5px; color:#2a3342;}
+  .panel li{margin-bottom:6px;}
+  .hl{background:#fff7e8; border-left:3px solid var(--m); padding:10px 14px; border-radius:0 8px 8px 0;
+    font-size:13.5px; margin:10px 0;}
+  .src{font-size:12px; color:var(--sub); margin-top:12px; border-top:1px dashed var(--line); padding-top:8px;}
+  .disc{font-size:12.5px; color:var(--sub); background:#f2f4f8; border-radius:10px; padding:12px 16px; margin-top:6px;}
+</style>
+</head>
+<body data-page-node-id="bZ8D9OwC2y6ojeV0MXoW3V">
+<div class="wrap" data-page-node-id="GpDq91Zy5IIJisFYGKqGZV">
+  <header data-page-node-id="c0zjdl8bzleIhjY9GQ9fK3">
+    <h1 data-page-node-id="V4BUrgdNbCnPpQdRA4DQAR">剑桥科技（603083.SH）· 布林通道（BOLL 20, 2）模型分析</h1>
+    <div class="meta" data-page-node-id="3kAmjT50LqwPNU3XnzI6Hu">数据截至 2026-09-01 盘中（约 10:50，A 股交易时段，收盘口径可能变化） · 参数：20 日中轨 ± 2 倍标准差（总体标准差） · 复权口径：前复权</div>
+  </header>
+
+  <div class="kpis" data-page-node-id="jiXcjgFkvEWvxEI9e7t8Ox">
+    <div class="kpi" data-page-node-id="PE8F8qli3XDXDKYFqD9iTx"><div class="k" data-page-node-id="CVE1UlSS5sxJhrnq08NFIs">最新价</div><div class="v" id="k-close" data-page-node-id="kzEcGZNjuIafPci9qGCIvg"></div><div class="s" id="k-chg" data-page-node-id="CZ9IuA7UwJ3qH0twuaNW8E"></div></div>
+    <div class="kpi" data-page-node-id="MSbMv2m2rXXMFy9fmZAfpD"><div class="k" data-page-node-id="J5Tha4XBBJS9sRih4Qwaa5">上轨 UPPER</div><div class="v" style="color:var(--u)" id="k-up" data-page-node-id="wgS0dRmeQ94qu8iP033qbd"></div><div class="s" id="k-upd" data-page-node-id="JmrRGJB8SSmZ0soDQfGRtb"></div></div>
+    <div class="kpi" data-page-node-id="RfrqGzO06ac4GsrKqyByxC"><div class="k" data-page-node-id="CGSzLwfU2hWqNZqlJuAnn4">中轨 MID</div><div class="v" style="color:var(--m)" id="k-mid" data-page-node-id="7BM49Mor6DBV5s9fD554Oi"></div><div class="s" id="k-midd" data-page-node-id="9Fsi1LMP7BzRUtjCXP22jX"></div></div>
+    <div class="kpi" data-page-node-id="CWA0pCCwhkTpAEd5AFsUIs"><div class="k" data-page-node-id="iKEJ3vR9x86if6alQ7ru8y">下轨 LOWER</div><div class="v" style="color:var(--u)" id="k-low" data-page-node-id="apg9HJ340AuAnRjeeCqZbv"></div><div class="s" id="k-lowd" data-page-node-id="CllYwQkDaf315cXPP3LE5v"></div></div>
+    <div class="kpi" data-page-node-id="lyl6jSslNAM0JmPxcW5IJP"><div class="k" data-page-node-id="ngE8dpDoZITUUuUYX9BRE8">%B 位置</div><div class="v" id="k-pb" data-page-node-id="2Ty47rrgQLfFfixTMitj7G"></div><div class="s" data-page-node-id="Sm1iSuLll8g4zcC6SuAczl">0=下轨 · 1=上轨</div></div>
+    <div class="kpi" data-page-node-id="SmnR6dysgOa7QxuWCE3oLG"><div class="k" data-page-node-id="DcCCjYgBxCKn9RwkkFBbLD">带宽 Bandwidth</div><div class="v" id="k-bw" data-page-node-id="Vw0mxuz8Ci3ON8gmVR3GCu"></div><div class="s" id="k-bwp" data-page-node-id="k9hDRVYxFzR8vClni6Yl7r"></div></div>
+  </div>
+
+  <div class="panel" data-page-node-id="bJGlkBdGTKqORDjGwRUp2o">
+    <h2 data-page-node-id="5aYU2dIfHrEeDBJdlwlj8c">日 K 线 × 布林通道</h2>
+    <div class="toolbar" data-page-node-id="1h3z5TntsrUBIy7wY8AISE">
+      <button data-r="60" data-page-node-id="0BV9CO6Vy5T2MCMw0h4QTV">近 60 交易日</button>
+      <button data-r="130" class="on" data-page-node-id="remPzJx7LduAFjSTxFKVrp">近 130 交易日</button>
+      <div class="legend" data-page-node-id="xvBdTN5CFD3aKE6DlvK7fq">
+        <span data-page-node-id="yeZ8YyeDHYc1pmVVjGGt8S"><i style="background:var(--u)" data-page-node-id="KKvQzqnpJ6FxNSGAFYsTfX"></i>上轨/下轨</span>
+        <span data-page-node-id="b2XE5iE11uDnNKxzII2KRx"><i style="background:var(--m)" data-page-node-id="GxQKkecGHbQGhFVPPEONR0"></i>中轨 MA20</span>
+        <span data-page-node-id="QaEIi3DxbQdYBmvRnGGRd7"><i style="background:var(--up)" data-page-node-id="8rYJDckJkRcqpgbLfzlvoC"></i>阳线(涨)</span>
+        <span data-page-node-id="ctZsYXCtRb1wBxw91trjFC"><i style="background:var(--down)" data-page-node-id="OTGw0t8MIqAtCoTt4dpFET"></i>阴线(跌)</span>
+      </div>
+    </div>
+    <canvas id="chart" data-page-node-id="RbNfyUP3pBJSqJCyv17RoA"></canvas>
+    <div id="tip" data-page-node-id="saDeGYDZuNfRYY2PiqEAcC"></div>
+    <div class="src" data-page-node-id="CPMlpAZlM1v05xXyg1IjnB">图注：鼠标悬停查看单日 OHLC、布林三轨与 %B；下方副图分别为成交量（万手）与 %B 摆动指标。数据来源：腾讯自选股（westock 数据接口）日 K 线，本地 BOLL(20,2) 计算，与 westock 技术指标接口交叉校验一致（偏差 0.00）。</div>
+  </div>
+
+  <div class="panel" data-page-node-id="rxpRwSGVtfE99IwF3Fa7S7">
+    <h2 data-page-node-id="OwGhBmOFxGC8oGTaoQNdpc">模型读数</h2>
+    <ul data-page-node-id="HTwAP71r6JBP30nzznJ3Ff">
+      <li data-page-node-id="lncAoXHhC8keL4y0v3vh6Q"><b data-page-node-id="oBcpttbU2nLK4TDR2q8sMk">通道位置</b>：盘中 178.2 元位于中轨（173.57）上方、上轨（204.77）下方，%B = 0.574 —— 上行趋势通道内的中性偏上位置，未到超买（%B&gt;0.95 才算贴上轨）。</li>
+      <li data-page-node-id="xDTjzYOdeTPOJt0o1ZKKm6"><b data-page-node-id="k5nwB1a2cvPUCvaW73y6Xz">中轨方向</b>：MA20 由 20 个交易日前的 170.40 升至 173.57，近 5 日再升 12.92 元，斜率陡峭向上 —— 短期趋势判定为<b data-page-node-id="BHpG5FdM7ApBYhg83RriUt">上行</b>，8 月主升浪的惯性仍在。</li>
+      <li data-page-node-id="knywm0I6B97ubBP30MIoso"><b data-page-node-id="H8pHoYMBDabm9crYST6GBS">带宽状态</b>：带宽 35.95%，处于近一年 65.2 分位 —— 波动率持续高位，通道<b data-page-node-id="t8yXr4lh30jHjZLde3VyMt">无挤压（Squeeze）形态</b>。这是一只近 60 日 6 次收盘破轨的极端波动标的，±10% 涨停跌停是常态。</li>
+      <li data-page-node-id="PoBrE8zDxd8JHpcPYObET1"><b data-page-node-id="2w3ZwiHMAC1krvc1EB4XiN">近期触轨记录</b>：三段典型——① 6-22~6-25 主升段连续 4 日收盘贴上轨（贴轨上行）；② 7-29/7-30 连续破下轨（7-30 收 130.13 vs 下轨 136.94），随后 8 月 V 型反转至 8-27 高点 201（+54%）；③ 8-14/8-17 再度突破上轨，8-28 冲高 204.5（≈当前上轨 204.77）后回落。</li>
+      <li data-page-node-id="Dj5b0IzCKQndarOS62lLyv"><b data-page-node-id="20u2wfZCEKvMTZ187PRnRz">量能特征</b>：8-27 放量 37.2 万手冲 201 后量能逐日萎缩（8-28 23.4 万 → 8-31 16.8 万 → 9-01 盘中 10.0 万手），价格同步回落 —— 接近上轨的「量缩价跌」组合需警惕双头。</li>
+    </ul>
+    <div class="hl" data-page-node-id="Uz8gvq9B9DrDwbjeEf32FQ">
+      <b data-page-node-id="8u8deugDjo04qvPkh3aAHW">一句话结论</b>：布林模型当前定性为「上行通道内的冲高回落」——价格仍站在快速上行的中轨上方，但 8-27/8-28 双顶（201 / 204.5）与上轨 204.77 构成强压制；短线核心看中轨 173.6 得失：守住则高位宽幅震荡（173–205），放量跌破则回踩 8-13 平台 160 一线。
+    </div>
+  </div>
+
+  <div class="panel" data-page-node-id="og7Ia2dTN5nPvK3w7Qtdn4">
+    <h2 data-page-node-id="a4HkA5Sn07gltCwDePhQPG">关键价位（相对盘中 178.2）</h2>
+    <table data-page-node-id="SNgPwYowCRiefz5NgtvfvJ">
+      <thead data-page-node-id="efnapDwC1SqEE5j8eB8IeD"><tr data-page-node-id="XA9XZEwOdrNY187Gi8yimJ"><th data-page-node-id="YnkBlrclDMScfXTY7kOEvk">轨道</th><th data-page-node-id="L4MfnEzDMqlzUyAX4AKrtj">数值（元）</th><th data-page-node-id="uJwLlmlJ1pgX1ZZ2rj992U">相对现价</th><th data-page-node-id="1wYuOHU7rftFDEzId6HI6i">模型含义</th></tr></thead>
+      <tbody data-page-node-id="jeMVmOzSBJuo8IYt7OhHfB">
+        <tr data-page-node-id="AesHSULv0acHJOMHatjD4y"><td data-page-node-id="HIB93COPZQFxvR5EYcFESg">上轨 UPPER</td><td class="n" data-page-node-id="sQZ4wrLXrEqKaJtMcLOC5F">204.77</td><td class="n pos" data-page-node-id="mUN4L1JHHz9mb0WRbWQcwx">+14.91%</td><td data-page-node-id="yPFr0AtWdLJDKQKYDQ7I99">强压力：与 8-28 高点 204.5 几乎重合，放量长阳站上才视为双头结构破除</td></tr>
+        <tr data-page-node-id="MqnvLGQk7tLRevOa3aCveO"><td data-page-node-id="ETrw63bDfBP1vzAjKS4wdY">中轨 MID</td><td class="n" data-page-node-id="jp0XdBckHdmIt0nsuOxHzH">173.57</td><td class="n neg" data-page-node-id="BZvHcs6hTikP2VCSUGmoHe">-2.60%</td><td data-page-node-id="fXrnUwTfMS6Ra066Sqekub">多空分界：今日盘中最低 177 尚未触及；收盘跌破 = 短线转弱第一信号</td></tr>
+        <tr data-page-node-id="aPXKczOTn2o9Er9IVFRVbS"><td data-page-node-id="X2jgRbd14YkH0lnLoSP0d5">下轨 LOWER</td><td class="n" data-page-node-id="aTtsjrFzNQir2MiGfX2mSr">142.37</td><td class="n neg" data-page-node-id="w5gF6sB63qsdEgoDTbzDnu">-20.10%</td><td data-page-node-id="CYFSXkjYniHitEXNS3Gart">动态支撑：7-30 破轨后曾 V 型反转 +54%；放量破位则打开新一轮下行</td></tr>
+      </tbody>
+    </table>
+    <p style="margin-top:10px" data-page-node-id="2pb3Gz1x5c3Xd1IgvOwdGl">注：三轨随每日收盘动态更新，上表为 2026-09-01 盘中口径（约 10:50）。</p>
+  </div>
+
+  <div class="panel" data-page-node-id="MgSSEzFRmOGf9JrpXH8bgf">
+    <h2 data-page-node-id="sKnbH4eYMRuNteS0GUeAzu">信号解读与条件化推演</h2>
+    <ul data-page-node-id="UzOqDFQrZDq1g6H5QA7HAc">
+      <li data-page-node-id="XgV5eEGFyWhE4952Wx3vJE"><b data-page-node-id="WQBXKHSv7j2SETbk1qRZQO">均值回归视角</b>：近一年两个极端样本——6 月贴轨上行（趋势单边，+4 日破轨不回头）与 7 月末破下轨 V 型反转（超卖修复 +54%）。当前处于两者之间的「上轨压力位」状态，历史上 8-14/8-17 破上轨后均迎来一段回调，上轨附近追高的性价比低。</li>
+      <li data-page-node-id="xayAvagAJySiOlCW9hABKT"><b data-page-node-id="2FEHwox0XJAUU9vrpOOADu">趋势视角</b>：中轨斜率 +12.92 元/5 日仍陡峭向上，趋势未破；但带宽 65.2 分位 + 量能连续三日萎缩，趋势动能边际减弱 —— 趋势仍在上行，但已经进入「高位钝化」区域。</li>
+      <li data-page-node-id="A2RT0Alrl1c4NWCThBOqXZ"><b data-page-node-id="jUoP8yzlzZ0cDjqQyuaWlA">条件 → 判断</b>：① 收盘站稳 173.6（中轨）上方且量能回升 → 高位宽幅震荡延续（173–205），上轨 205 为强压力，突破需放量长阳；② 放量收盘跌破 173.6 → 短线转弱，第一目标 8-13 平台 160–163，极端情形下探 150 一线（8-12 平台）→ 下轨 142；③ 205 附近再次放量滞涨/长上影 → 双头成立风险上升，参照 6-26 见顶（263）后约 -50% 的回落结构，需快速离场纪律。</li>
+      <li data-page-node-id="g0noeMgI9ifSJYy3UaC1hl"><b data-page-node-id="eBEmH5XDMqRizKY68WaUj8">更大周期背景</b>：年初至今 +32.89%，52 周区间 73.83–263.30，现价处于区间中部偏上；PE(TTM) 139.5 倍、PB 7.01 倍 —— 题材驱动（光模块/CPO）的高估值标的，布林读数的均值回归属性弱于基本面定价，波动放大是常态而非例外。</li>
+    </ul>
+  </div>
+
+  <div class="panel" data-page-node-id="47LqDZxlMM3p68AmcU4odP">
+    <h2 data-page-node-id="fh3AfXsgbXxb15k8rZ3IgM">模型局限与反向声音</h2>
+    <ul data-page-node-id="YJXg0Oz2NNZ0C66HdQRomQ">
+      <li data-page-node-id="pl0RJYktt1UcgGNwpDnSI6">布林通道是<b data-page-node-id="iVvRHBEarH1J2sFYXeRO3A">波动率自适应的描述模型</b>，不是预测模型；三轨跟着价格走，"上轨压力/下轨支撑"在趋势极端时会被单日击穿（近 60 日 6 次破轨），对题材股的信号可靠性低于普通标的。</li>
+      <li data-page-node-id="OvnrPBcxlsWGx8FDB9NtHk">带宽分位基于近 243 个交易日样本，样本外（更长周期）分位可能不同。</li>
+      <li data-page-node-id="V2UXMZMtDVhM4ban3srtW8"><b data-page-node-id="vdeYSkBqwUEa88nyTVMWp1">反向声音</b>：「冲高回落看空」的读数可能低估了 8 月主升浪的动量惯性——8-26/8-27 曾连续两日从 176 快速拉升至 198（+12%），若 9 月初在 173–178 区域再次放量拉起，双头结构将被破坏，上轨 205 并非不可突破；反之若跌破 173.6 而中轨斜率仍向上，也可能是急跌洗盘（"假摔"），需以收盘价而非盘中价为确认标准。</li>
+      <li data-page-node-id="nhbicZkQ7cynpGcfYx25gC">技术信号无法覆盖基本面事件（订单落地、业绩披露、减持公告）对题材股的脉冲式冲击——该股 PE(TTM) 139.5 倍，任何风吹草动都可能引发剧烈波动，仓位管理优先于点位判断。</li>
+    </ul>
+    <div class="src" data-page-node-id="4fJg5N9cdx0XJ5vYZDbcgM">数据来源：腾讯自选股（westock 数据接口）行情快照 / 日 K 线 / 技术指标，2026-09-01 盘中（约 10:50）；BOLL(20,2) 为本地计算并与 westock 技术指标接口交叉校验一致（三轨偏差 0.00）。52 周高低点、涨跌幅、PE/PB 引自同源行情快照。</div>
+    <div class="disc" data-page-node-id="onlLbIJ2JtSe8R5hPn2f2X"><b data-page-node-id="Qxcq6YmmVT8lOLSHOFdDv9">免责声明</b>：以上内容基于公开数据和量化分析，仅供参考，不构成投资建议。市场有风险，投资需谨慎。任何投资决策应结合个人风险承受能力、资金状况和投资目标独立判断，必要时咨询持牌专业机构。过往表现不预示未来收益。</div>
+  </div>
+</div>
+
+<script>
+const DATA = {"summary": {"last_date": "2026-09-01", "close": 178.2, "prev_close": 187.6, "upper": 204.77, "mid": 173.57, "lower": 142.37, "pb": 0.574, "bw_pct_value": 35.95, "bw_percentile": 65.2, "pb_percentile": 51.8, "mid_slope_5d": 12.92, "mid_20d_ago": 170.4, "vs_westock_absdiff": {"upper": 0.0, "mid": 0.0, "lower": 0.0}, "touch_low_events": [{"date": "2026-07-29", "close": 144.59, "lower": 144.68}, {"date": "2026-07-30", "close": 130.13, "lower": 136.94}], "touch_high_events": [{"date": "2026-06-22", "close": 235.99, "upper": 226.82}, {"date": "2026-06-23", "close": 238.37, "upper": 233.04}, {"date": "2026-06-24", "close": 262.21, "upper": 245.7}, {"date": "2026-06-25", "close": 260.4, "upper": 255.83}, {"date": "2026-08-14", "close": 185.9, "upper": 184.86}, {"date": "2026-08-17", "close": 190.21, "upper": 190.06}], "n_samples": 243, "date_range": ["2025-09-01", "2026-09-01"]}, "chart": [["2026-02-25", 104.76, 106.93, 103.7, 105.7, 146341, 115.91, 107.33, 98.74], ["2026-02-26", 106.25, 108.7, 104.42, 108.05, 232719, 115.34, 107.1, 98.86], ["2026-02-27", 105.22, 105.22, 102.77, 103.12, 210177, 114.64, 106.63, 98.61], ["2026-03-02", 99.73, 113.46, 99.58, 113.46, 475842, 115.34, 106.84, 98.35], ["2026-03-03", 114.72, 116.2, 109.82, 110.13, 386616, 115.27, 106.82, 98.37], ["2026-03-04", 106.98, 112.6, 106.4, 108.91, 209686, 114.82, 106.66, 98.5], ["2026-03-05", 111.36, 117.54, 109.05, 112.9, 315662, 115.0, 106.71, 98.41], ["2026-03-06", 111.58, 117.2, 108.29, 114.5, 341765, 115.79, 106.93, 98.07], ["2026-03-09", 109.8, 111.72, 103.22, 110.99, 309456, 115.38, 106.81, 98.24], ["2026-03-10", 113.43, 121.71, 113.23, 119.82, 418606, 117.74, 107.46, 97.19], ["2026-03-11", 119.72, 127.97, 118.6, 125.98, 464571, 121.1, 108.15, 95.2], ["2026-03-12", 123.52, 131.4, 121.16, 122.32, 361188, 123.24, 108.92, 94.6], ["2026-03-13", 119.56, 124.05, 117.16, 117.43, 249437, 124.11, 109.68, 95.25], ["2026-03-16", 115.92, 119.02, 114.02, 118.6, 214709, 124.88, 110.58, 96.29], ["2026-03-17", 119.7, 119.7, 108.72, 108.81, 258574, 124.86, 110.78, 96.7], ["2026-03-18", 110.71, 114.01, 107.65, 112.25, 191161, 124.95, 111.18, 97.41], ["2026-03-19", 107.77, 117.72, 107.6, 115.39, 292384, 124.98, 111.89, 98.8], ["2026-03-20", 117.72, 122.52, 114.18, 115.05, 350719, 125.01, 112.48, 99.94], ["2026-03-23", 109.72, 111.48, 103.52, 103.56, 319926, 124.77, 112.58, 100.4], ["2026-03-24", 106.32, 106.68, 102.42, 105.57, 198903, 124.7, 112.63, 100.55], ["2026-03-25", 108.6, 110.52, 106.69, 109.66, 265126, 124.57, 112.83, 101.08], ["2026-03-26", 108.08, 109.62, 104.4, 105.15, 191447, 124.72, 112.68, 100.64], ["2026-03-27", 101.8, 106.08, 100.16, 104.25, 169561, 124.61, 112.74, 100.87], ["2026-03-30", 102.22, 106.64, 101.86, 105.01, 130509, 124.64, 112.31, 99.98], ["2026-03-31", 104.72, 105.25, 100.72, 101.32, 186024, 125.08, 111.87, 98.66], ["2026-04-01", 104.32, 105.22, 102.54, 104.96, 196262, 125.17, 111.68, 98.18], ["2026-04-02", 103.77, 107.28, 101.32, 101.95, 195967, 125.25, 111.13, 97.0], ["2026-04-03", 103.31, 105.07, 101.91, 102.71, 201233, 125.03, 110.54, 96.05], ["2026-04-07", 102.81, 103.72, 99.87, 101.13, 191705, 125.1, 110.05, 94.99], ["2026-04-08", 104.72, 111.27, 104.71, 111.27, 379414, 124.01, 109.62, 95.22], ["2026-04-09", 112.65, 116.76, 112.65, 115.27, 430281, 121.69, 109.08, 96.48], ["2026-04-10", 116.53, 117.6, 114.04, 115.96, 287464, 120.29, 108.76, 97.24], ["2026-04-13", 111.71, 119.7, 111.27, 118.3, 375147, 120.47, 108.81, 97.14], ["2026-04-14", 118.52, 124.0, 116.92, 120.34, 361117, 120.87, 108.9, 96.92], ["2026-04-15", 125.23, 132.4, 123.74, 125.52, 653477, 123.73, 109.73, 95.73], ["2026-04-16", 124.9, 132.37, 122.22, 131.8, 445282, 127.69, 110.71, 93.73], ["2026-04-17", 138.72, 145.01, 138.72, 145.01, 235554, 134.78, 112.19, 89.6], ["2026-04-20", 159.39, 159.5, 149.77, 152.02, 629691, 142.54, 114.04, 85.53], ["2026-04-21", 150.55, 162.29, 149.19, 160.89, 466780, 151.5, 116.9, 82.31], ["2026-04-22", 157.92, 176.58, 155.72, 171.9, 594044, 161.84, 120.22, 78.61], ["2026-04-23", 169.72, 172.62, 160.84, 164.05, 480592, 168.37, 122.94, 77.51], ["2026-04-24", 159.72, 163.98, 151.73, 153.36, 396880, 171.86, 125.35, 78.85], ["2026-04-27", 155.36, 160.08, 152.44, 153.31, 250685, 174.77, 127.8, 80.84], ["2026-04-28", 159.72, 162.59, 153.72, 154.91, 409927, 177.46, 130.3, 83.14], ["2026-04-29", 154.22, 170.43, 154.22, 170.43, 297762, 182.03, 133.75, 85.48], ["2026-04-30", 178.72, 187.22, 174.5, 174.69, 385900, 186.75, 137.24, 87.73], ["2026-05-06", 185.52, 185.62, 176.07, 178.94, 330739, 191.0, 141.09, 91.19], ["2026-05-07", 181.8, 184.67, 170.72, 183.79, 314193, 195.09, 145.14, 95.2], ["2026-05-08", 178.72, 194.22, 178.72, 189.56, 290541, 198.8, 149.57, 100.33], ["2026-05-11", 188.7, 203.38, 187.22, 197.52, 336495, 204.04, 153.88, 103.72], ["2026-05-12", 202.75, 209.38, 185.24, 189.14, 386199, 206.68, 157.57, 108.46], ["2026-05-13", 186.38, 192.94, 186.08, 191.36, 251424, 208.64, 161.34, 114.04], ["2026-05-14", 204.72, 207.72, 184.22, 191.59, 336068, 209.68, 165.01, 120.33], ["2026-05-15", 192.92, 199.24, 185.72, 187.84, 300896, 209.07, 168.38, 127.69], ["2026-05-18", 188.28, 190.52, 181.72, 184.02, 235381, 207.4, 171.31, 135.21], ["2026-05-19", 184.02, 202.42, 173.83, 202.42, 355577, 208.52, 174.84, 141.16], ["2026-05-20", 196.9, 198.99, 190.27, 193.88, 338537, 208.98, 177.28, 145.58], ["2026-05-21", 194.39, 195.87, 178.1, 179.19, 295482, 208.15, 178.64, 149.13], ["2026-05-22", 181.35, 191.99, 179.56, 190.0, 242836, 208.82, 180.09, 151.37], ["2026-05-25", 192.0, 209.0, 183.3, 209.0, 333971, 213.01, 181.95, 150.89], ["2026-05-26", 213.0, 219.49, 202.0, 204.94, 314440, 215.46, 183.99, 152.53], ["2026-05-27", 203.6, 206.6, 185.0, 188.5, 355398, 213.93, 185.75, 157.57], ["2026-05-28", 188.5, 206.0, 186.65, 203.04, 321460, 213.11, 188.24, 163.37], ["2026-05-29", 201.96, 219.0, 199.2, 207.7, 383505, 211.95, 190.88, 169.8], ["2026-06-01", 199.21, 203.0, 186.93, 187.0, 377890, 210.7, 191.71, 172.71], ["2026-06-02", 187.33, 194.99, 183.0, 189.85, 322554, 209.82, 192.46, 175.1], ["2026-06-03", 192.91, 208.84, 190.2, 202.6, 468073, 210.37, 193.65, 176.92], ["2026-06-04", 194.0, 211.1, 194.0, 204.17, 321136, 211.35, 194.67, 177.98], ["2026-06-05", 206.85, 214.3, 190.0, 192.02, 340017, 211.35, 194.79, 178.22], ["2026-06-08", 179.0, 187.88, 173.1, 174.76, 289570, 212.3, 193.65, 175.0], ["2026-06-09", 179.5, 182.82, 175.6, 180.97, 227070, 212.62, 193.24, 173.87], ["2026-06-10", 176.5, 179.64, 171.13, 175.99, 157926, 213.25, 192.47, 171.69], ["2026-06-11", 175.53, 178.5, 166.25, 171.08, 220318, 214.23, 191.45, 168.67], ["2026-06-12", 177.0, 188.19, 176.8, 182.99, 382675, 214.24, 191.21, 168.17], ["2026-06-15", 188.18, 201.29, 184.0, 201.29, 271367, 215.25, 192.07, 168.89], ["2026-06-16", 208.0, 208.0, 196.55, 198.07, 281199, 214.72, 191.85, 168.98], ["2026-06-17", 198.0, 203.89, 196.29, 203.29, 255673, 215.72, 192.32, 168.92], ["2026-06-18", 200.0, 217.54, 199.79, 214.54, 276406, 218.57, 194.09, 169.61], ["2026-06-22", 225.3, 235.99, 216.02, 235.99, 358731, 226.82, 196.39, 165.96], ["2026-06-23", 240.0, 249.58, 227.37, 238.37, 364995, 233.04, 197.86, 162.67], ["2026-06-24", 237.0, 262.21, 236.83, 262.21, 307264, 245.7, 200.72, 155.74], ["2026-06-25", 260.0, 263.3, 253.03, 260.4, 323788, 255.83, 204.32, 152.8], ["2026-06-26", 258.0, 259.88, 242.5, 245.92, 239317, 261.06, 206.46, 151.86], ["2026-06-29", 247.4, 258.48, 235.94, 247.78, 250905, 265.97, 208.46, 150.96], ["2026-06-30", 255.0, 256.36, 238.8, 254.87, 234259, 271.85, 211.86, 151.87], ["2026-07-01", 253.0, 257.5, 240.01, 242.7, 205603, 275.04, 214.5, 153.96], ["2026-07-02", 218.43, 226.99, 218.43, 218.43, 237812, 275.6, 215.29, 154.99], ["2026-07-03", 207.51, 219.24, 207.0, 209.37, 219665, 275.71, 215.55, 155.4], ["2026-07-06", 214.2, 214.98, 193.0, 196.56, 210532, 275.61, 215.78, 155.95], ["2026-07-07", 196.0, 202.0, 191.0, 197.2, 185709, 274.41, 216.9, 159.39], ["2026-07-08", 197.34, 200.97, 188.33, 189.99, 182528, 273.86, 217.35, 160.84], ["2026-07-09", 193.99, 202.66, 179.59, 202.0, 324633, 272.43, 218.65, 164.88], ["2026-07-10", 218.88, 222.2, 198.99, 199.09, 344983, 270.13, 220.05, 169.98], ["2026-07-13", 194.5, 205.0, 183.45, 185.32, 235719, 269.91, 220.17, 170.43], ["2026-07-14", 188.98, 201.0, 182.01, 200.23, 265118, 269.94, 220.12, 170.29], ["2026-07-15", 202.0, 216.9, 202.0, 208.1, 331156, 269.74, 220.62, 171.5], ["2026-07-16", 201.98, 213.0, 193.91, 195.7, 210101, 270.0, 220.24, 170.47], ["2026-07-17", 193.43, 195.58, 176.13, 176.13, 207655, 271.65, 218.32, 164.99], ["2026-07-20", 176.0, 176.76, 158.52, 158.52, 226389, 273.07, 214.44, 155.82], ["2026-07-21", 154.5, 174.0, 142.67, 171.05, 369010, 271.53, 211.08, 150.63], ["2026-07-22", 168.47, 180.52, 165.57, 167.06, 289679, 264.87, 206.32, 147.77], ["2026-07-23", 172.0, 180.0, 165.01, 169.03, 242988, 256.87, 201.75, 146.64], ["2026-07-24", 165.51, 174.89, 163.01, 166.8, 148929, 250.99, 197.8, 144.61], ["2026-07-27", 166.8, 173.97, 164.94, 173.78, 183581, 242.99, 194.1, 145.21], ["2026-07-28", 165.96, 167.96, 156.4, 156.4, 146167, 232.05, 189.17, 146.29], ["2026-07-29", 149.8, 150.78, 140.76, 144.59, 283920, 223.85, 184.27, 144.68], ["2026-07-30", 140.7, 144.4, 130.13, 130.13, 246349, 222.77, 179.85, 136.94], ["2026-07-31", 138.56, 141.85, 130.08, 130.25, 305426, 221.69, 175.9, 130.1], ["2026-08-03", 127.49, 136.98, 125.7, 135.17, 272671, 220.84, 172.83, 124.81], ["2026-08-04", 143.33, 148.69, 137.61, 148.69, 257775, 218.15, 170.4, 122.65], ["2026-08-05", 133.88, 152.31, 133.85, 149.56, 346419, 216.06, 168.38, 120.7], ["2026-08-06", 145.02, 155.77, 143.8, 152.8, 247823, 211.44, 165.92, 120.4], ["2026-08-07", 155.06, 161.45, 152.3, 154.78, 276040, 206.8, 163.7, 120.61], ["2026-08-10", 156.0, 156.34, 144.39, 147.92, 225398, 204.25, 161.83, 119.41], ["2026-08-11", 147.77, 156.21, 145.58, 152.35, 187782, 198.17, 159.44, 120.71], ["2026-08-12", 153.08, 163.83, 152.0, 159.7, 209267, 188.69, 157.02, 125.35], ["2026-08-13", 163.0, 175.67, 159.3, 169.0, 385596, 182.61, 155.69, 128.76], ["2026-08-14", 170.19, 185.9, 170.0, 185.9, 397817, 184.86, 156.17, 127.48], ["2026-08-17", 190.0, 194.69, 184.0, 190.21, 384773, 190.06, 157.76, 125.45], ["2026-08-18", 193.44, 194.21, 183.0, 186.05, 234766, 192.66, 158.51, 124.36], ["2026-08-19", 177.99, 177.99, 167.45, 167.45, 250198, 192.7, 158.53, 124.36], ["2026-08-20", 172.0, 183.5, 165.1, 179.09, 244744, 194.09, 159.03, 123.97], ["2026-08-21", 179.14, 190.85, 177.48, 180.97, 263010, 195.95, 159.74, 123.53], ["2026-08-24", 183.56, 184.78, 170.74, 174.99, 197654, 196.11, 159.8, 123.49], ["2026-08-25", 169.5, 178.11, 168.07, 173.5, 173660, 197.41, 160.66, 123.9], ["2026-08-26", 176.5, 190.85, 175.5, 190.85, 269815, 201.18, 162.97, 124.76], ["2026-08-27", 193.0, 201.0, 183.83, 198.21, 372402, 204.4, 166.37, 128.34], ["2026-08-28", 197.88, 204.5, 191.8, 192.31, 234394, 205.27, 169.47, 133.68], ["2026-08-31", 185.73, 192.9, 185.0, 187.6, 168466, 205.02, 172.1, 139.17], ["2026-09-01", 189.0, 189.0, 177.0, 178.2, 99646, 204.77, 173.57, 142.37]]};
+const S = DATA.summary, C = DATA.chart;
+const cv = document.getElementById('chart'), ctx = cv.getContext('2d');
+const tip = document.getElementById('tip');
+let RANGE = 130, hoverIdx = -1;
+
+/* KPI */
+(function(){
+  const c = S.close, p = S.prev_close, chg = (c/p-1)*100;
+  document.getElementById('k-close').textContent = c.toFixed(2);
+  const kc = document.getElementById('k-chg');
+  kc.textContent = (chg>=0?'+':'') + chg.toFixed(2) + '%（vs 前收）';
+  kc.className = 's ' + (chg>=0?'pos':'neg');
+  document.getElementById('k-up').textContent = S.upper.toFixed(2);
+  document.getElementById('k-upd').textContent = '+' + ((S.upper/c-1)*100).toFixed(2) + '%';
+  document.getElementById('k-mid').textContent = S.mid.toFixed(2);
+  document.getElementById('k-midd').textContent = ((S.mid/c-1)*100).toFixed(2) + '%';
+  document.getElementById('k-low').textContent = S.lower.toFixed(2);
+  document.getElementById('k-lowd').textContent = ((S.lower/c-1)*100).toFixed(2) + '%';
+  document.getElementById('k-pb').textContent = S.pb.toFixed(2);
+  document.getElementById('k-bw').textContent = S.bw_pct_value.toFixed(2) + '%';
+  document.getElementById('k-bwp').textContent = '近一年 ' + S.bw_percentile.toFixed(0) + ' 分位';
+})();
+
+/* 布局 */
+const W = 960, H = 560, PADL = 8, PADR = 56;
+const P0 = 8, P1 = 322;      // 价格区
+const V0 = 338, V1 = 428;    // 成交量区
+const B0 = 444, B1 = 534;    // %B 区
+const UP = '#d93838', DN = '#0a9d6c', UC = '#5b7cff', MC = '#e8961e';
+
+function fit(){
+  const dpr = window.devicePixelRatio || 1;
+  const cssW = cv.clientWidth || W;
+  const scale = cssW / W;
+  cv.width = cssW * dpr; cv.height = H * scale * dpr;
+  cv.style.height = (H * scale) + 'px';
+  ctx.setTransform(dpr * scale, 0, 0, dpr * scale, 0, 0);
+  draw();
+}
+
+function draw(){
+  const data = C.slice(-RANGE);
+  const n = data.length;
+  const plotW = W - PADL - PADR, cw = plotW / n;
+  let lo = Infinity, hi = -Infinity, vmax = 0;
+  for (const d of data){
+    lo = Math.min(lo, d[3], d[8] === null ? d[3] : d[8]);
+    hi = Math.max(hi, d[2], d[6] === null ? d[2] : d[6]);
+    vmax = Math.max(vmax, d[5]);
+  }
+  const pad = (hi - lo) * 0.06;
+  lo -= pad; hi += pad;
+  const x = i => PADL + (i + 0.5) * cw;
+  const y = p => P0 + (P1 - P0) * (1 - (p - lo) / (hi - lo));
+  ctx.clearRect(0, 0, W, H);
+  ctx.font = '11px "PingFang SC", sans-serif';
+
+  /* 网格与Y轴 */
+  ctx.strokeStyle = '#eef1f5'; ctx.fillStyle = '#8a94a4'; ctx.lineWidth = 1;
+  for (let g = 0; g <= 4; g++){
+    const p = lo + (hi - lo) * g / 4, yy = y(p);
+    ctx.beginPath(); ctx.moveTo(PADL, yy); ctx.lineTo(W - PADR, yy); ctx.stroke();
+    ctx.textAlign = 'left'; ctx.fillText(p.toFixed(0), W - PADR + 6, yy + 3.5);
+  }
+  /* X轴日期 */
+  ctx.textAlign = 'center'; ctx.fillStyle = '#8a94a4';
+  const step = Math.max(1, Math.floor(n / 9));
+  for (let i = n - 1; i >= 0; i -= step){
+    ctx.fillText(data[i][0].slice(2), x(i), P1 + 14);
+  }
+
+  /* 布林带填充 */
+  ctx.beginPath();
+  let started = false;
+  for (let i = 0; i < n; i++){ const u = data[i][6]; if (u === null) continue;
+    if (!started){ ctx.moveTo(x(i), y(u)); started = true; } else ctx.lineTo(x(i), y(u)); }
+  for (let i = n - 1; i >= 0; i--){ const l = data[i][8]; if (l === null) continue; ctx.lineTo(x(i), y(l)); }
+  ctx.closePath(); ctx.fillStyle = 'rgba(91,124,255,0.07)'; ctx.fill();
+
+  /* 三轨 */
+  const line = (idx, col, dash) => {
+    ctx.beginPath(); ctx.strokeStyle = col; ctx.lineWidth = 1.6;
+    ctx.setLineDash(dash || []);
+    let st = false;
+    for (let i = 0; i < n; i++){ const v = data[i][idx]; if (v === null) continue;
+      const yy = y(v); if (!st){ ctx.moveTo(x(i), yy); st = true; } else ctx.lineTo(x(i), yy); }
+    ctx.stroke(); ctx.setLineDash([]);
+  };
+  line(6, UC); line(8, UC); line(7, MC);
+
+  /* 右端三轨标签 */
+  ctx.textAlign = 'left';
+  const lastRow = data[n - 1];
+  if (lastRow[6] !== null){
+    ctx.fillStyle = UC;
+    ctx.fillText('上 ' + lastRow[6].toFixed(1), W - PADR + 6, y(lastRow[6]) + 3.5);
+    ctx.fillText('下 ' + lastRow[8].toFixed(1), W - PADR + 6, y(lastRow[8]) + 3.5);
+    ctx.fillStyle = MC;
+    ctx.fillText('中 ' + lastRow[7].toFixed(1), W - PADR + 6, y(lastRow[7]) + 3.5);
+  }
+
+  /* K线 */
+  const bw2 = Math.max(1.5, cw * 0.62);
+  for (let i = 0; i < n; i++){
+    const d = data[i], up = d[4] >= d[1];
+    ctx.strokeStyle = up ? UP : DN; ctx.fillStyle = up ? UP : DN;
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(x(i), y(d[2])); ctx.lineTo(x(i), y(d[3])); ctx.stroke();
+    const yo = y(d[1]), yc = y(d[4]), top = Math.min(yo, yc), h = Math.max(1, Math.abs(yo - yc));
+    ctx.fillRect(x(i) - bw2 / 2, top, bw2, h);
+  }
+
+  /* 成交量（万手） */
+  ctx.fillStyle = '#8a94a4'; ctx.textAlign = 'left';
+  ctx.fillText((vmax / 1e4).toFixed(0) + '万手', W - PADR + 6, V0 + 10);
+  ctx.strokeStyle = '#eef1f5';
+  ctx.beginPath(); ctx.moveTo(PADL, V1); ctx.lineTo(W - PADR, V1); ctx.stroke();
+  for (let i = 0; i < n; i++){
+    const d = data[i], h = (V1 - V0 - 4) * d[5] / vmax;
+    ctx.fillStyle = d[4] >= d[1] ? 'rgba(217,56,56,0.55)' : 'rgba(10,157,108,0.55)';
+    ctx.fillRect(x(i) - bw2 / 2, V1 - h, bw2, h);
+  }
+  ctx.fillStyle = '#8a94a4'; ctx.textAlign = 'center';
+  ctx.fillText('成交量', PADL + 24, V0 + 10);
+
+  /* %B */
+  ctx.strokeStyle = '#eef1f5';
+  const yb = v => B0 + (B1 - B0) * (1 - v);
+  [0, 0.5, 1].forEach(v => {
+    ctx.beginPath(); ctx.setLineDash(v === 0.5 ? [4, 4] : []);
+    ctx.moveTo(PADL, yb(v)); ctx.lineTo(W - PADR, yb(v)); ctx.stroke(); ctx.setLineDash([]);
+    ctx.fillStyle = '#8a94a4'; ctx.textAlign = 'left'; ctx.fillText(v.toFixed(1), W - PADR + 6, yb(v) + 3.5);
+  });
+  ctx.beginPath(); ctx.strokeStyle = UC; ctx.lineWidth = 1.4;
+  let st2 = false;
+  for (let i = 0; i < n; i++){
+    const u = data[i][6], l = data[i][8]; if (u === null || l === null) continue;
+    const pb = (data[i][4] - l) / (u - l);
+    if (!st2){ ctx.moveTo(x(i), yb(pb)); st2 = true; } else ctx.lineTo(x(i), yb(pb));
+  }
+  ctx.stroke();
+  ctx.fillStyle = '#8a94a4'; ctx.textAlign = 'center';
+  ctx.fillText('%B', PADL + 14, B0 + 10);
+
+  /* 十字光标 */
+  if (hoverIdx >= 0 && hoverIdx < n){
+    const i = hoverIdx, d = data[i];
+    ctx.strokeStyle = '#b4bdc9'; ctx.setLineDash([3, 3]); ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(x(i), P0); ctx.lineTo(x(i), B1); ctx.stroke(); ctx.setLineDash([]);
+    ctx.fillStyle = '#1f2733';
+    ctx.beginPath(); ctx.arc(x(i), y(d[4]), 2.6, 0, Math.PI * 2); ctx.fill();
+  }
+}
+
+cv.addEventListener('mousemove', e => {
+  const rect = cv.getBoundingClientRect();
+  const scaleX = W / rect.width;
+  const mx = (e.clientX - rect.left) * scaleX;
+  const data = C.slice(-RANGE), n = data.length;
+  const cw = (W - PADL - PADR) / n;
+  const i = Math.floor((mx - PADL) / cw);
+  if (i < 0 || i >= n){ hoverIdx = -1; tip.style.display = 'none'; draw(); return; }
+  hoverIdx = i;
+  const d = data[i];
+  const prev = i > 0 ? data[i - 1][4] : d[1];
+  const chg = (d[4] / prev - 1) * 100;
+  const pb = (d[6] !== null && d[8] !== null) ? ((d[4] - d[8]) / (d[6] - d[8])) : null;
+  tip.innerHTML =
+    '<b>' + d[0] + '</b><br>' +
+    '开 ' + d[1].toFixed(2) + '　高 ' + d[2].toFixed(2) + '　低 ' + d[3].toFixed(2) + '<br>' +
+    '收 <b style="color:' + (chg >= 0 ? UP : DN) + '">' + d[4].toFixed(2) + '</b>（' + (chg >= 0 ? '+' : '') + chg.toFixed(2) + '%）<br>' +
+    '上轨 ' + (d[6] === null ? '-' : d[6].toFixed(1)) + '　中轨 ' + (d[7] === null ? '-' : d[7].toFixed(1)) + '　下轨 ' + (d[8] === null ? '-' : d[8].toFixed(1)) + '<br>' +
+    '%B ' + (pb === null ? '-' : pb.toFixed(2)) + '　量 ' + (d[5] / 1e4).toFixed(1) + '万手';
+  tip.style.display = 'block';
+  const tw = tip.offsetWidth;
+  tip.style.left = Math.min(window.innerWidth - tw - 12, e.clientX + 14) + 'px';
+  tip.style.top = (e.clientY + 14) + 'px';
+  draw();
+});
+cv.addEventListener('mouseleave', () => { hoverIdx = -1; tip.style.display = 'none'; draw(); });
+
+document.querySelectorAll('.toolbar button').forEach(b => {
+  b.addEventListener('click', () => {
+    document.querySelectorAll('.toolbar button').forEach(x => x.classList.remove('on'));
+    b.classList.add('on');
+    RANGE = parseInt(b.dataset.r, 10);
+    hoverIdx = -1; tip.style.display = 'none';
+    draw();
+  });
+});
+
+window.addEventListener('resize', fit);
+fit();
+</script>
+</body>
+</html>
