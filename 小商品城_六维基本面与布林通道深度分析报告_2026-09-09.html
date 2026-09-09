@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>小商品城 (600415.SH) · 六维基本面与布林通道深度诊断报告</title>
+<style>
+  :root {
+    --bg: #0f172a;
+    --surface: #1e293b;
+    --surface-card: #182234;
+    --surface-hover: #24344d;
+    --border: #334155;
+    --border-light: rgba(255, 255, 255, 0.08);
+    --text-main: #f8fafc;
+    --text-muted: #94a3b8;
+    --text-dim: #64748b;
+    --up: #f43f5e;       /* A股涨-红/玫瑰红 */
+    --up-bg: rgba(244, 63, 94, 0.12);
+    --up-border: rgba(244, 63, 94, 0.35);
+    --down: #10b981;     /* A股跌-绿/翠绿 */
+    --down-bg: rgba(16, 185, 129, 0.12);
+    --down-border: rgba(16, 185, 129, 0.35);
+    --warn: #f59e0b;     /* 黄灯预警 */
+    --warn-bg: rgba(245, 158, 11, 0.12);
+    --warn-border: rgba(245, 158, 11, 0.35);
+    --accent: #38bdf8;   /* 亮蓝 */
+    --accent-glow: rgba(56, 189, 248, 0.2);
+    --purple: #a855f7;
+    --radius-sm: 8px;
+    --radius-md: 14px;
+    --radius-lg: 20px;
+    --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background-color: var(--bg);
+    color: var(--text-main);
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+    line-height: 1.6;
+    padding: 32px 16px;
+    background-image: 
+      radial-gradient(at 0% 0%, rgba(56, 189, 248, 0.08) 0px, transparent 50%),
+      radial-gradient(at 100% 100%, rgba(168, 85, 247, 0.06) 0px, transparent 50%);
+    min-height: 100vh;
+  }
+
+  .container {
+    max-width: 1240px;
+    margin: 0 auto;
+  }
+
+  /* 顶部导航与标题区 */
+  header {
+    margin-bottom: 28px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  .title-group h1 {
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .stock-code {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--accent);
+    background: rgba(56, 189, 248, 0.12);
+    border: 1px solid rgba(56, 189, 248, 0.3);
+    padding: 3px 10px;
+    border-radius: 999px;
+  }
+  .subtitle {
+    color: var(--text-muted);
+    font-size: 14px;
+    margin-top: 6px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .badges-group {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .badge {
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text-muted);
+  }
+  .badge.baoyu {
+    background: linear-gradient(135deg, rgba(168, 85, 247, 0.15), rgba(56, 189, 248, 0.15));
+    border-color: rgba(168, 85, 247, 0.4);
+    color: #e2e8f0;
+  }
+
+  /* 便当盒 Bento Grid 核心布局 */
+  .bento-grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 18px;
+    margin-bottom: 24px;
+  }
+
+  .col-12 { grid-column: span 12; }
+  .col-8 { grid-column: span 8; }
+  .col-7 { grid-column: span 7; }
+  .col-6 { grid-column: span 6; }
+  .col-5 { grid-column: span 5; }
+  .col-4 { grid-column: span 4; }
+  .col-3 { grid-column: span 3; }
+
+  @media (max-width: 1024px) {
+    .col-8, .col-7, .col-5, .col-4, .col-3 { grid-column: span 6; }
+  }
+  @media (max-width: 720px) {
+    .col-8, .col-7, .col-6, .col-5, .col-4, .col-3 { grid-column: span 12; }
+  }
+
+  /* 卡片基类 */
+  .card {
+    background: var(--surface-card);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-md);
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    transition: transform 0.2s ease, border-color 0.2s ease;
+  }
+  .card:hover {
+    border-color: rgba(255, 255, 255, 0.18);
+  }
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+  }
+  .card-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text-main);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .card-title .icon {
+    font-size: 16px;
+  }
+  .status-pill {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 999px;
+  }
+  .pill-warn { background: var(--warn-bg); color: var(--warn); border: 1px solid var(--warn-border); }
+  .pill-danger { background: var(--up-bg); color: var(--up); border: 1px solid var(--up-border); }
+  .pill-good { background: var(--down-bg); color: var(--down); border: 1px solid var(--down-border); }
+  .pill-accent { background: rgba(56,189,248,0.12); color: var(--accent); border: 1px solid rgba(56,189,248,0.3); }
+
+  /* 顶部 4联 KPI 卡片 */
+  .kpi-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 18px;
+  }
+  .kpi-label {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: 500;
+  }
+  .kpi-num {
+    font-size: 26px;
+    font-weight: 800;
+    margin: 6px 0;
+    font-feature-settings: "tnum";
+    letter-spacing: -0.5px;
+  }
+  .kpi-sub {
+    font-size: 12px;
+    color: var(--text-dim);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  /* 颜色标注 */
+  .pos { color: var(--up); }
+  .neg { color: var(--down); }
+  .warn { color: var(--warn); }
+  .accent { color: var(--accent); }
+
+  /* 数据条与进度条 */
+  .progress-bar-bg {
+    background: var(--surface);
+    height: 6px;
+    border-radius: 999px;
+    overflow: hidden;
+    margin: 8px 0;
+    position: relative;
+  }
+  .progress-fill {
+    height: 100%;
+    border-radius: 999px;
+  }
+
+  /* 表格样式 */
+  .bento-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12.5px;
+    margin-top: 10px;
+  }
+  .bento-table th {
+    text-align: left;
+    color: var(--text-dim);
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--border);
+    font-weight: 600;
+  }
+  .bento-table td {
+    padding: 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    color: var(--text-main);
+  }
+  .bento-table tr:last-child td { border-bottom: none; }
+  .bento-table tr:hover td { background: rgba(255, 255, 255, 0.02); }
+
+  /* 列表卡片 */
+  .insight-list {
+    list-style: none;
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+  .insight-list li {
+    position: relative;
+    padding-left: 18px;
+    margin-bottom: 10px;
+    line-height: 1.55;
+  }
+  .insight-list li::before {
+    content: "•";
+    position: absolute;
+    left: 0;
+    top: 0;
+    color: var(--accent);
+    font-size: 16px;
+  }
+  .insight-list li strong {
+    color: var(--text-main);
+  }
+
+  /* BOLL 技术面仪表盘专区 */
+  .boll-visual {
+    background: #111827;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 16px;
+    margin-top: 12px;
+  }
+  .channel-line {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    margin: 4px 0;
+    border-radius: 6px;
+    font-size: 12px;
+    font-family: monospace;
+  }
+  .ch-upper { background: rgba(244, 63, 94, 0.08); border-left: 3px solid var(--up); color: #fda4af; }
+  .ch-mid { background: rgba(56, 189, 248, 0.08); border-left: 3px solid var(--accent); color: #bae6fd; }
+  .ch-lower { background: rgba(16, 185, 129, 0.08); border-left: 3px solid var(--down); color: #a7f3d0; }
+  .ch-current { background: rgba(245, 158, 11, 0.15); border-left: 3px solid var(--warn); color: #fde68a; font-weight: bold; }
+
+  /* 原生 Canvas 图表容器 */
+  .chart-canvas-wrap {
+    position: relative;
+    width: 100%;
+    height: 180px;
+    margin-top: 12px;
+  }
+  canvas {
+    width: 100% !important;
+    height: 100% !important;
+    display: block;
+  }
+
+  /* 底部免责声明 */
+  footer {
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+    color: var(--text-dim);
+    font-size: 12px;
+    line-height: 1.7;
+  }
+  .disclaimer-badge {
+    display: inline-block;
+    color: var(--warn);
+    border: 1px solid var(--warn-border);
+    background: var(--warn-bg);
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: bold;
+    margin-bottom: 8px;
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <!-- 头部 -->
+  <header>
+    <div class="title-group">
+      <h1>小商品城 <span class="stock-code">600415.SH</span> 深度研报</h1>
+      <div class="subtitle">
+        <span>数据基准：2026 年半年度报告（8月26日披） + 2026-09-09 盘中实时行情</span>
+        <span>•</span>
+        <span>归母净利 19.79 亿 (+17.05%)</span>
+        <span>•</span>
+        <span>总市值 687.09 亿元</span>
+      </div>
+    </div>
+    <div class="badges-group">
+      <span class="badge baoyu">✨ Baoyu Bento-Grid 架构</span>
+      <span class="badge">六维基本面模型</span>
+      <span class="badge">BOLL (20,2) 量化</span>
+      <span class="badge">全业务线透视</span>
+    </div>
+  </header>
+
+  <!-- 第一行：顶层核心 KPI Bento 卡片 (4格) -->
+  <div class="bento-grid">
+    <div class="card kpi-card col-3">
+      <div>
+        <div class="kpi-label">最新股价 · PE / PB</div>
+        <div class="kpi-num accent">12.53 <span style="font-size:14px;font-weight:normal;color:var(--text-dim);">元</span></div>
+      </div>
+      <div class="kpi-sub">
+        <span>PE(TTM): 15.30x</span>
+        <span>PB: 3.11x</span>
+      </div>
+      <div style="margin-top:10px;">
+        <div style="font-size:11px;color:var(--text-dim);display:flex;justify-content:space-between;">
+          <span>52周低 9.46</span>
+          <span>当前位置 (YTD -18.9%)</span>
+          <span>52周高 19.81</span>
+        </div>
+        <div class="progress-bar-bg">
+          <div class="progress-fill" style="width: 29.6%; background: var(--accent);"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card kpi-card col-3">
+      <div>
+        <div class="kpi-label">2026 H1 营收 · 结构异动</div>
+        <div class="kpi-num pos">102.82 <span style="font-size:14px;font-weight:normal;color:var(--text-dim);">亿元</span></div>
+      </div>
+      <div class="kpi-sub">
+        <span>同比增速: <b class="pos">+33.30%</b></span>
+        <span>首次破百亿大关</span>
+      </div>
+      <div style="margin-top:10px;">
+        <div style="font-size:11px;color:var(--text-dim);display:flex;justify-content:space-between;">
+          <span>自营贸易占 53%</span>
+          <span>市场收租仅占 23%</span>
+        </div>
+        <div class="progress-bar-bg">
+          <div class="progress-fill" style="width: 53%; background: var(--purple);"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card kpi-card col-3">
+      <div>
+        <div class="kpi-label">归母 vs 扣非净利 · 剪刀差</div>
+        <div class="kpi-num">19.79 <span style="font-size:14px;font-weight:normal;color:var(--text-dim);">/ 18.23 亿</span></div>
+      </div>
+      <div class="kpi-sub">
+        <span>归母: <b class="pos">+17.05%</b></span>
+        <span>扣非: <b style="color:var(--text-main);">+9.29%</b></span>
+      </div>
+      <div style="margin-top:10px;">
+        <div style="font-size:11px;color:var(--text-dim);display:flex;justify-content:space-between;">
+          <span>Q1 扣非 +19.4%</span>
+          <span class="warn">Q2 扣非仅 +0.56% (停滞)</span>
+        </div>
+        <div class="progress-bar-bg">
+          <div class="progress-fill" style="width: 92%; background: var(--warn);"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card kpi-card col-3">
+      <div>
+        <div class="kpi-label">类现金覆盖与现金流警示</div>
+        <div class="kpi-num warn">1.02 <span style="font-size:14px;font-weight:normal;color:var(--text-dim);">倍</span></div>
+      </div>
+      <div class="kpi-sub">
+        <span>类现金 33.59亿</span>
+        <span>有息负债 32.86亿</span>
+      </div>
+      <div style="margin-top:10px;">
+        <div style="font-size:11px;color:var(--up);display:flex;justify-content:space-between;">
+          <span>⚠️ H1 经营现金流</span>
+          <span style="font-weight:bold;">-1.29 亿元 (由正转负)</span>
+        </div>
+        <div class="progress-bar-bg">
+          <div class="progress-fill" style="width: 100%; background: var(--up);"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 第二行：六维基本面拆解 (核心对比与业务线) -->
+  <div class="bento-grid">
+    <!-- ① 主业还原与业务结构 8列大卡片 -->
+    <div class="card col-8">
+      <div class="card-header">
+        <div class="card-title">
+          <span class="icon">🔍</span>
+          <span>① 剔除噪音还原主业：表观突破百亿背后的“增收不增利”</span>
+        </div>
+        <span class="status-pill pill-warn">结构性降毛利</span>
+      </div>
+
+      <p style="font-size:13px;color:var(--text-muted);margin-bottom:12px;">
+        2026 上半年营收首次突破 100 亿，但综合毛利率由 31.55% 回落至 <strong>29.04% (-2.51pct)</strong>。主业还原显示：高毛利的传统市场商位收租基本平稳，增量主要来自<strong>极低毛利的商品自营贸易</strong>及<strong>一次性配套写字楼交付</strong>。
+      </p>
+
+      <table class="bento-table">
+        <thead>
+          <tr>
+            <th>业务板块</th>
+            <th>H1 营业收入</th>
+            <th>占比</th>
+            <th>同比变动</th>
+            <th>毛利率特征</th>
+            <th>商业模式角色</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong style="color:var(--purple);">商品销售 (自营贸易)</strong></td>
+            <td>54.51 亿元</td>
+            <td>53.02%</td>
+            <td class="pos">+20.25%</td>
+            <td><span class="warn">0.83%</span> (微利)</td>
+            <td>流水盘 · 支撑供应链生态与外贸数据</td>
+          </tr>
+          <tr>
+            <td><strong style="color:var(--accent);">市场商位经营 (租金)</strong></td>
+            <td>23.67 亿元</td>
+            <td>23.02%</td>
+            <td>+3.24%</td>
+            <td><span class="pos">~70%+</span> (高毛利)</td>
+            <td>基本盘 · 现金奶牛核心利润源泉</td>
+          </tr>
+          <tr>
+            <td><strong style="color:#f59e0b);">配套房产 (数贸写字楼)</strong></td>
+            <td>15.65 亿元</td>
+            <td>15.22%</td>
+            <td class="pos">净增约12亿</td>
+            <td>偏低 (税负高)</td>
+            <td>一次性结算盘 · 全球数贸中心配套</td>
+          </tr>
+          <tr>
+            <td><strong>贸易服务 (Chinagoods)</strong></td>
+            <td>3.79 亿元</td>
+            <td>3.69%</td>
+            <td class="neg">-28.69%</td>
+            <td>高毛利数字化</td>
+            <td>平台服务盘 · 去年同期高基数回落</td>
+          </tr>
+          <tr>
+            <td><strong>酒店餐饮及其他租赁</strong></td>
+            <td>5.20 亿元</td>
+            <td>5.05%</td>
+            <td class="pos">+16.8%</td>
+            <td>中等</td>
+            <td>线下商流、客流配套服务</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- 营收 vs 毛利双柱状 Canvas 图 -->
+      <div class="chart-canvas-wrap" style="height:150px;">
+        <canvas id="revenueStructureChart"></canvas>
+      </div>
+      <div style="font-size:11px;color:var(--text-dim);text-align:right;margin-top:4px;">图1：各业务板块收入规模 vs 毛利贡献显著倒挂</div>
+    </div>
+
+    <!-- ② 分季度拐点预警 4列卡片 -->
+    <div class="card col-4">
+      <div class="card-header">
+        <div class="card-title">
+          <span class="icon">⏱️</span>
+          <span>② 分季度趋势：Q2 扣非几乎停滞</span>
+        </div>
+        <span class="status-pill pill-danger">警示信号</span>
+      </div>
+
+      <div style="background:var(--surface);padding:12px;border-radius:var(--radius-sm);margin-bottom:12px;">
+        <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text-muted);margin-bottom:4px;">
+          <span>2026 Q1 扣非净利: 9.45 亿</span>
+          <span class="pos">+19.4%</span>
+        </div>
+        <div class="progress-bar-bg">
+          <div class="progress-fill" style="width: 75%; background: var(--up);"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text-muted);margin-top:10px;margin-bottom:4px;">
+          <span>2026 Q2 扣非净利: 8.78 亿</span>
+          <span class="warn">仅 +0.56% (降速)</span>
+        </div>
+        <div class="progress-bar-bg">
+          <div class="progress-fill" style="width: 15%; background: var(--warn);"></div>
+        </div>
+      </div>
+
+      <ul class="insight-list">
+        <li><strong>单季降速主因</strong>：Q2 大量交付写字楼低毛利货盘，土地增值税集中清算，导致 H1 <strong>税金及附加达 2.48 亿元 (+175%)</strong>；</li>
+        <li><strong>传统商位未涨租</strong>：在第六代市场全面转化为稳态收租前，存量老市场的租金现金流缺乏内生提价弹性；</li>
+        <li><strong>季度定性</strong>：呈现典型的“Q1 开门红、Q2 平台期消化结算成本”态势。</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- 第三行：新引擎期权、资产负债表与股东回报 -->
+  <div class="bento-grid">
+    <!-- ③ 新引擎三大期权 4列卡片 -->
+    <div class="card col-4">
+      <div class="card-header">
+        <div class="card-title">
+          <span class="icon">🚀</span>
+          <span>③ 核心增量：新引擎与出海</span>
+        </div>
+        <span class="status-pill pill-accent">平台期权</span>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div style="background:rgba(56,189,248,0.06);border:1px solid rgba(56,189,248,0.2);padding:12px;border-radius:var(--radius-sm);">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <strong style="font-size:13px;color:var(--accent);">Yiwu Pay 义支付</strong>
+            <span style="font-size:11px;color:var(--accent);">流水放量</span>
+          </div>
+          <div style="font-size:12px;color:var(--text-muted);margin-top:4px;">
+            2026 H1 跨境流水突破 <strong>25.1 亿美元</strong>；取得香港 MSO 及 TCSP 牌照，数字人民币跨境结算试点落地。
+          </div>
+        </div>
+
+        <div style="background:rgba(168,85,247,0.06);border:1px solid rgba(168,85,247,0.2);padding:12px;border-radius:var(--radius-sm);">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <strong style="font-size:13px;color:#c084fc;">全球数贸中心 (第六代)</strong>
+            <span style="font-size:11px;color:#c084fc;">全面投运</span>
+          </div>
+          <div style="font-size:12px;color:var(--text-muted);margin-top:4px;">
+            2026 年 5 月全面投运，日均客流超 <strong>6.6 万人次</strong>（外商超 7000 人次）。未来 2~3 年承接新一轮商铺租金放量核心载体。
+          </div>
+        </div>
+
+        <div style="background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.2);padding:12px;border-radius:var(--radius-sm);">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <strong style="font-size:13px;color:var(--down);">H 股上市申请</strong>
+            <span style="font-size:11px;color:var(--down);">资本出海</span>
+          </div>
+          <div style="font-size:12px;color:var(--text-muted);margin-top:4px;">
+            2026 年 5 月正式递表港交所主板，开启 A+H 双融资平台，推进海外仓与分市场布局。
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ④ 费用杠杆 & ⑤ 资产负债表与现金流 4列卡片 -->
+    <div class="card col-4">
+      <div class="card-header">
+        <div class="card-title">
+          <span class="icon">🛡️</span>
+          <span>④&⑤ 费用杠杆与现金流“黄灯”</span>
+        </div>
+        <span class="status-pill pill-warn">需高度警惕</span>
+      </div>
+
+      <ul class="insight-list">
+        <li><strong>费用管控极强</strong>：销售费用率仅 1.25%，管理费用率 2.07%，财务费用基本平衡（-12.6万元），国企管理杠杆极高；</li>
+        <li><strong>类现金覆盖薄弱</strong>：账面货币资金及理财 <strong>33.59 亿元</strong>，面对有息负债 <strong>32.86 亿元</strong>，覆盖比仅 <strong>1.02 倍</strong>，远逊于分众（4.3倍）和格力；</li>
+        <li><strong>经营现金流转负 (-1.29 亿)</strong>：
+          <div style="background:var(--surface);padding:8px 10px;border-radius:6px;margin-top:6px;font-size:12px;color:var(--text-muted);">
+            ① 2025 全年百亿现金流系收取数贸中心巨额押金，今年高基数消退；<br>
+            ② 上半年采购付款增加 12.15 亿 + 缴纳大额房产税费 1.33 亿。
+          </div>
+        </li>
+      </ul>
+    </div>
+
+    <!-- ⑥ 股东回报与估值周期 4列卡片 -->
+    <div class="card col-4">
+      <div class="card-header">
+        <div class="card-title">
+          <span class="icon">🎁</span>
+          <span>⑥ 股东回报与周期定位</span>
+        </div>
+        <span class="status-pill pill-good">国资高分红</span>
+      </div>
+
+      <div style="margin-bottom:12px;">
+        <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text-dim);">
+          <span>2026 中期分红方案</span>
+          <span class="pos">每 10 股派 1.0 元</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text-dim);margin-top:4px;">
+          <span>2025 年度实施分红</span>
+          <span class="pos">每 10 股派 5.0 元 (27.42亿)</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text-dim);margin-top:4px;">
+          <span>历史累计派现募资比</span>
+          <span class="accent">256.5% (强回馈)</span>
+        </div>
+      </div>
+
+      <div style="background:#111827;padding:12px;border-radius:var(--radius-sm);border:1px solid var(--border);font-size:12px;line-height:1.6;">
+        <strong style="color:var(--accent);">周期位置定性：</strong><br>
+        此前受“中特估+跨境支付”催化估值曾炒高至 25~30 倍；当前回调至 PE 15.3x，已处于估值消化充分区。目前处于<strong>“新市场交付结算 → 稳态租金放量”的业绩验证关键窗口</strong>。
+      </div>
+    </div>
+  </div>
+
+  <!-- 第四行：BOLL (20, 2) 技术面量化推演 (12列大卡片) -->
+  <div class="bento-grid">
+    <div class="card col-12">
+      <div class="card-header">
+        <div class="card-title">
+          <span class="icon">📈</span>
+          <span>布林通道 (BOLL 20, 2) 技术形态与多空博弈沙盘</span>
+        </div>
+        <span class="status-pill pill-accent">中轨上方蓄势</span>
+      </div>
+
+      <div style="display:grid;grid-template-columns: 1fr 1fr; gap: 20px;">
+        <!-- 左侧：通道区间与点位 -->
+        <div>
+          <div style="font-size:13px;color:var(--text-muted);margin-bottom:8px;">布林带三轨关键量化数据 (日线周期)：</div>
+          <div class="boll-visual">
+            <div class="channel-line ch-upper">
+              <span>布林上轨 [Upper Band]</span>
+              <span>13.24 元 (强阻力区)</span>
+            </div>
+            <div class="channel-line ch-current">
+              <span>当前最新收盘价 [Close]</span>
+              <span>12.53 元 (中轨上方回踩)</span>
+            </div>
+            <div class="channel-line ch-mid">
+              <span>布林中轨 [Middle Band · 20MA]</span>
+              <span>12.42 元 (第一多空分水岭)</span>
+            </div>
+            <div class="channel-line ch-lower">
+              <span>布林下轨 [Lower Band]</span>
+              <span>11.60 元 (强支撑买点区)</span>
+            </div>
+          </div>
+
+          <div style="margin-top:14px;font-size:12.5px;color:var(--text-muted);line-height:1.6;">
+            <p><strong>形态特征解析：</strong></p>
+            <p>9 月 4 日股价盘中一度冲击 <strong>13.14 元</strong>，在上轨压制下形成长上影线回落，近期连续缩量回踩，目前正测试 <strong>12.42 元中轨生命线</strong>。若日线收盘能稳守中轨，多头结构完好；若放量跌破，则将向 12.00 元平台寻底。</p>
+          </div>
+        </div>
+
+        <!-- 右侧：BOLL 通道示意图与动能指标 -->
+        <div>
+          <div style="font-size:13px;color:var(--text-muted);margin-bottom:8px;">布林通道走势模拟与中轨支撑图示：</div>
+          <div class="chart-canvas-wrap" style="height:140px;background:#111827;border-radius:var(--radius-sm);border:1px solid var(--border);padding:6px;">
+            <canvas id="bollCanvasChart"></canvas>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;">
+            <div style="background:var(--surface);padding:8px 12px;border-radius:6px;font-size:12px;">
+              <span style="color:var(--text-dim);">MACD(12,26,9)</span><br>
+              <span style="color:#fda4af;">DIF: 0.274</span> / <span style="color:#93c5fd;">DEA: 0.281</span><br>
+              <span class="warn">零轴微幅死叉粘合 (动能放缓)</span>
+            </div>
+            <div style="background:var(--surface);padding:8px 12px;border-radius:6px;font-size:12px;">
+              <span style="color:var(--text-dim);">KDJ(9,3,3)</span><br>
+              <span>K: 65.2 / D: 74.6 / J: 46.6</span><br>
+              <span class="warn">J自超买区死叉下拐 (浮筹消化)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 第五行：诊断结论与跟踪清单 (8列+4列) -->
+  <div class="bento-grid">
+    <div class="card col-8">
+      <div class="card-header">
+        <div class="card-title">
+          <span class="icon">🎯</span>
+          <span>综合诊断结论与操作策略参考</span>
+        </div>
+        <span class="status-pill pill-accent">中立客观推演</span>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+        <div style="background:rgba(244,63,94,0.06);border:1px solid rgba(244,63,94,0.2);padding:12px;border-radius:var(--radius-sm);">
+          <strong style="color:var(--up);font-size:13px;">⚠️ 潜在制约与警惕项</strong>
+          <ul class="insight-list" style="margin-top:6px;font-size:12px;">
+            <li><strong>增收不增利</strong>：自营微利贸易推高规模，老商位租金缺乏提价空间；</li>
+            <li><strong>现金流转负</strong>：H1 经营现金流为负，类现金对有息负债仅 1.02 倍覆盖；</li>
+            <li><strong>税费拖累</strong>：写字楼集中交付导致土地增值税集中爆发。</li>
+          </ul>
+        </div>
+
+        <div style="background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.2);padding:12px;border-radius:var(--radius-sm);">
+          <strong style="color:var(--down);font-size:13px;">💡 核心看点与向上期权</strong>
+          <ul class="insight-list" style="margin-top:6px;font-size:12px;">
+            <li><strong>第六代数贸中心</strong>：5月全面投运后日均6.6万人流，租金转化期权大；</li>
+            <li><strong>Yiwu Pay 跨境清算</strong>：流水跨越式放量，跨境金融增值空间广阔；</li>
+            <li><strong>H股出海与高分红</strong>：国资控股分红底线明确，PE 15.3x 估值风险已消化。</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="card col-4">
+      <div class="card-header">
+        <div class="card-title">
+          <span class="icon">📌</span>
+          <span>后续核心观察清单</span>
+        </div>
+      </div>
+
+      <ul class="insight-list" style="font-size:12.5px;">
+        <li><strong>三季报租金转固</strong>：关注数贸中心新增商位是否带来高毛利净增量；</li>
+        <li><strong>Yiwu Pay 净费率</strong>：百亿级流水向财报净利润的具体变现进度；</li>
+        <li><strong>12.40 元中轨防守</strong>：技术面回踩不破可视为波段回踩确认，跌破则观望 12.00 支撑。</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- 页脚与免责声明 -->
+  <footer>
+    <div class="disclaimer-badge">合规免责声明</div>
+    <p>1. 本报告仅供学术研究与定量分析参考，不构成针对任何具体投资者的证券投资咨询、买卖建议或承诺保本保收益。市场有风险，入市需谨慎。</p>
+    <p>2. 报告中引用的财务数据来自小商品城（600415.SH）披露之定期报告与公开法定公告；行情指标与布林通道参数基于历史公开交易数据推导，过往表现不代表未来走势。</p>
+    <p style="margin-top:6px;color:var(--text-dim);">Generated with Baoyu Infographic Design Principles · StockReport v2 · 2026-09-09</p>
+  </footer>
+</div>
+
+<script>
+  // 原生 Canvas 绘制图1：业务结构对比（收入占比 vs 毛利贡献）
+  (function initRevenueChart() {
+    const canvas = document.getElementById('revenueStructureChart');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const dpr = window.devicePixelRatio || 1;
+    
+    function render() {
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      ctx.scale(dpr, dpr);
+      
+      const width = rect.width;
+      const height = rect.height;
+      ctx.clearRect(0, 0, width, height);
+
+      const items = [
+        { name: "自营贸易", rev: 54.51, profit: 0.45, color: "#a855f7" },
+        { name: "市场收租", rev: 23.67, profit: 16.57, color: "#38bdf8" },
+        { name: "配套房产", rev: 15.65, profit: 3.13, color: "#f59e0b" },
+        { name: "贸易服务", rev: 3.79, profit: 2.65, color: "#10b981" },
+        { name: "酒店及其他", rev: 5.20, profit: 1.56, color: "#94a3b8" }
+      ];
+
+      const barHeight = 16;
+      const gap = 10;
+      const startX = 80;
+      const maxRev = 60;
+      const availWidth = width - startX - 70;
+
+      ctx.font = "11px sans-serif";
+      ctx.textBaseline = "middle";
+
+      items.forEach((item, idx) => {
+        const y = 14 + idx * (barHeight + gap);
+        
+        // Label
+        ctx.fillStyle = "#94a3b8";
+        ctx.textAlign = "right";
+        ctx.fillText(item.name, startX - 8, y + barHeight / 2);
+
+        // 营收条
+        const revW = (item.rev / maxRev) * availWidth;
+        ctx.fillStyle = item.color;
+        ctx.beginPath();
+        ctx.roundRect(startX, y, revW, barHeight, 4);
+        ctx.fill();
+
+        // 标注
+        ctx.fillStyle = "#f8fafc";
+        ctx.textAlign = "left";
+        ctx.fillText(item.rev + "亿 (毛利约 " + item.profit + "亿)", startX + revW + 8, y + barHeight / 2);
+      });
+    }
+
+    render();
+    window.addEventListener('resize', render);
+  })();
+
+  // 原生 Canvas 绘制图2：BOLL 通道示意图
+  (function initBollChart() {
+    const canvas = document.getElementById('bollCanvasChart');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const dpr = window.devicePixelRatio || 1;
+
+    function render() {
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      ctx.scale(dpr, dpr);
+
+      const w = rect.width;
+      const h = rect.height;
+      ctx.clearRect(0, 0, w, h);
+
+      // 上轨 (13.24)、现价 (12.53)、中轨 (12.42)、下轨 (11.60)
+      const topY = 20;
+      const midY = 70;
+      const botY = 120;
+      const currY = 64; // 12.53 在 12.42 上方一点
+
+      // 背景通道色
+      ctx.fillStyle = "rgba(56, 189, 248, 0.04)";
+      ctx.beginPath();
+      ctx.moveTo(10, topY);
+      ctx.bezierCurveTo(w * 0.3, topY - 4, w * 0.7, topY + 6, w - 10, topY);
+      ctx.lineTo(w - 10, botY);
+      ctx.bezierCurveTo(w * 0.7, botY + 4, w * 0.3, botY - 4, 10, botY);
+      ctx.closePath();
+      ctx.fill();
+
+      // 上轨线
+      ctx.strokeStyle = "#f43f5e";
+      ctx.lineWidth = 1.5;
+      ctx.setLineDash([4, 4]);
+      ctx.beginPath();
+      ctx.moveTo(10, topY);
+      ctx.bezierCurveTo(w * 0.3, topY - 4, w * 0.7, topY + 6, w - 10, topY);
+      ctx.stroke();
+
+      // 下轨线
+      ctx.strokeStyle = "#10b981";
+      ctx.beginPath();
+      ctx.moveTo(10, botY);
+      ctx.bezierCurveTo(w * 0.7, botY + 4, w * 0.3, botY - 4, 10, botY);
+      ctx.stroke();
+
+      // 中轨线
+      ctx.strokeStyle = "#38bdf8";
+      ctx.setLineDash([]);
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(10, midY);
+      ctx.bezierCurveTo(w * 0.3, midY - 2, w * 0.7, midY + 4, w - 10, midY);
+      ctx.stroke();
+
+      // 现价点与指引
+      ctx.fillStyle = "#f59e0b";
+      ctx.beginPath();
+      ctx.arc(w * 0.8, currY, 5, 0, Math.PI * 2);
+      ctx.fill();
+
+      // 标签
+      ctx.font = "11px sans-serif";
+      ctx.fillStyle = "#f59e0b";
+      ctx.fillText("现价 12.53 (回踩确认中)", w * 0.8 - 60, currY - 8);
+    }
+
+    render();
+    window.addEventListener('resize', render);
+  })();
+</script>
+</body>
+</html>
