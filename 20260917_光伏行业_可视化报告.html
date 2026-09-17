@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>光伏行业研究报告 2021—2026 | 可视化版</title>
+<style>
+:root{
+  --bg:#f6f7f9; --panel:#ffffff; --ink:#1c2330; --sub:#5b6472; --line:#e5e8ee;
+  --red:#d5453c; --green:#1d9e6f; --blue:#2b6cb0; --gold:#c78a1e; --purple:#6b4fa0;
+  --red-bg:#fdeceb; --green-bg:#e8f6f0; --blue-bg:#eaf2fb;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--ink);line-height:1.65}
+.wrap{max-width:1080px;margin:0 auto;padding:24px 20px 60px;position:relative}
+header{background:linear-gradient(135deg,#12314f,#1d5a86);color:#fff;border-radius:14px;padding:34px 34px 28px;margin-bottom:22px}
+header h1{font-size:26px;letter-spacing:.5px}
+header p{opacity:.85;margin-top:8px;font-size:14px}
+.tags{margin-top:14px;display:flex;gap:8px;flex-wrap:wrap}
+.tag{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.3);border-radius:99px;padding:2px 12px;font-size:12px}
+nav{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;position:sticky;top:0;background:var(--bg);padding:10px 0;z-index:5}
+nav button{border:1px solid var(--line);background:var(--panel);border-radius:99px;padding:7px 16px;font-size:13px;cursor:pointer;color:var(--sub);transition:.15s}
+nav button.on{background:var(--blue);border-color:var(--blue);color:#fff}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:22px}
+.kpi{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px 18px}
+.kpi .v{font-size:25px;font-weight:700;margin:2px 0}
+.kpi .l{font-size:12.5px;color:var(--sub)}
+.kpi .d{font-size:12px;margin-top:4px}
+.up{color:var(--red)} .down{color:var(--green)} .flat{color:var(--sub)}
+section{display:none;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:26px 28px;margin-bottom:18px}
+section.on{display:block}
+h2{font-size:19px;margin-bottom:6px;padding-bottom:10px;border-bottom:2px solid var(--blue);display:inline-block}
+h3{font-size:15.5px;margin:20px 0 8px;color:#24405e}
+p.desc{color:var(--sub);font-size:13.5px;margin-bottom:14px}
+.chart-box{border:1px solid var(--line);border-radius:10px;padding:14px;margin:12px 0;background:#fcfdfe}
+.chart-box svg{width:100%;height:auto;display:block}
+.tooltip{position:absolute;pointer-events:none;background:#1c2330;color:#fff;font-size:12px;border-radius:6px;padding:6px 10px;opacity:0;transition:.12s;z-index:9;white-space:nowrap}
+table{width:100%;border-collapse:collapse;font-size:13px;margin:10px 0}
+th{background:var(--blue-bg);color:#1f3f63;text-align:left;padding:8px 10px;border:1px solid var(--line)}
+td{padding:7px 10px;border:1px solid var(--line)}
+tr:hover td{background:#f4f8fd}
+.callout{border-left:4px solid var(--blue);background:var(--blue-bg);border-radius:0 8px 8px 0;padding:12px 16px;font-size:13.5px;margin:14px 0}
+.callout.warn{border-color:var(--gold);background:#fdf6e8}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:760px){.grid2{grid-template-columns:1fr}}
+ul.pts{margin:8px 0 8px 18px;font-size:13.5px}
+ul.pts li{margin:5px 0}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--sub);margin-top:6px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:middle}
+footer{color:var(--sub);font-size:12px;text-align:center;margin-top:26px}
+.disc{background:#fdf6e8;border:1px solid #ecd9a8;border-radius:10px;padding:14px 16px;font-size:12.5px;color:#6b5a1e;text-align:left}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <h1>光伏行业研究报告（2021—2026）</h1>
+  <p>一轮完整产能周期中的价值重构 · 可视化版 ｜ 数据截至 2026-09-17</p>
+  <div class="tags">
+    <span class="tag">完整行业研究</span><span class="tag">八大专项汇总</span><span class="tag">67 份材料溯源</span><span class="tag">离线单文件</span>
+  </div>
+</header>
+
+<nav id="nav">
+  <button data-t="s1" class="on">总览</button>
+  <button data-t="s2">市场规模</button>
+  <button data-t="s3">产业链</button>
+  <button data-t="s4">商业模式</button>
+  <button data-t="s5">竞争格局</button>
+  <button data-t="s6">政策环境</button>
+  <button data-t="s7">趋势判断</button>
+  <button data-t="s8">痛点</button>
+</nav>
+
+<div class="kpis">
+  <div class="kpi"><div class="l">中国光伏累计装机（2026-07）</div><div class="v">12.86 亿千瓦</div><div class="d flat">历史性超过煤电，第一大电源</div></div>
+  <div class="kpi"><div class="l">光伏发电量占全社会用电量</div><div class="v">13%</div><div class="d flat">装机 ≠ 电量：错位是矛盾原点</div></div>
+  <div class="kpi"><div class="l">2026H1 中国新增并网</div><div class="v down">71.77 GW</div><div class="d down">同比约 −66%（2025 抢装高基数）</div></div>
+  <div class="kpi"><div class="l">全球组件产能 vs 需求（2026）</div><div class="v">1100 / 536 GW</div><div class="d flat">行业利用率不足 60%</div></div>
+  <div class="kpi"><div class="l">2026H1 上市光伏企业亏损面</div><div class="v up">22 / 26 家</div><div class="d up">合计亏损约 183—214 亿元</div></div>
+  <div class="kpi"><div class="l">2026 全球新增装机预测中枢</div><div class="v">≈600 GW</div><div class="d flat">区间 500—680GW，同比 −8%〜−13%</div></div>
+</div>
+
+<section id="s1" class="on">
+  <h2>核心结论总览</h2>
+  <p class="desc">完整报告约 2.3 万字（Markdown 版），以下为五个核心判断的摘要与关键图。</p>
+  <div class="callout"><b>1｜第一大电源与 13% 电量的错位。</b>装机可以一年翻倍，消纳与收益模型跟不上——这是理解当前所有矛盾的原点（M003）。</div>
+  <div class="callout"><b>2｜教科书级产能周期走完剧本。</b>硅料 6—7 万→30.7 万元/吨（2022）→33 元/kg（2026H1）；四环节名义产能均破 1000GW，主链全亏（M061/M011/M007）。</div>
+  <div class="callout"><b>3｜"政策+市场"双轮再平衡。</b>136 号文全面入市、能耗国标 2027 年出清约 153.6GW、硅料减产挺价至 4.6 万元/吨——但 9 月库存仍超 54 万吨，是修复不是反转（M012/M008/M010）。</div>
+  <div class="callout"><b>4｜价值沿产业链迁移：制造不赚钱、系统在赚钱。</b>主链全亏的同时，阳光电源 2025 年净利 134.61 亿元、储能收入 +49.4%（M046）。</div>
+  <div class="callout"><b>5｜长期需求未坏，坏的是短期收益模型。</b>2030 年全球年新增或达 864GW；算电协同、绿电直连、光储平价构成新需求锚（M015/M052）。</div>
+  <div class="chart-box"><h3 style="margin-top:2px">中国光伏年度新增并网装机（GW）</h3>
+    <p class="desc">2025 年含抢装脉冲（1—5 月 197.85GW）；2026E 为多机构预测中枢（区间 180—240）。</p>
+    <div id="c0"></div>
+  </div>
+</section>
+
+<section id="s2">
+  <h2>市场规模与预测</h2>
+  <p class="desc">中国装机为并网（交流侧）口径；组件出货（直流、含出口）不可与装机相加。所有 2026 年预测保留机构区间。</p>
+  <div class="chart-box"><h3 style="margin-top:2px">2026 年新增装机预测：机构观点对比（GW）</h3><div id="c1"></div></div>
+  <h3>关键数字</h3>
+  <table>
+    <tr><th>指标</th><th>数值</th><th>口径与来源</th></tr>
+    <tr><td>中国新增装机 2021→2025</td><td>54.88 → 316.6 GW</td><td>并网口径，CAGR≈55%（M032/M034）</td></tr>
+    <tr><td>2026H1 新增 / 发电量</td><td>71.77 GW / 6555 亿 kWh</td><td>利用率 91.4%（M001）</td></tr>
+    <tr><td>2025 组件出口</td><td>267.6 GW（+13%）</td><td>InfoLink（M021）</td></tr>
+    <tr><td>2026H1 光伏产品出口额</td><td>171.83 亿美元（+24.3%）</td><td>量稳额增（M015）</td></tr>
+    <tr><td>中国电站投资额</td><td>2025 约 1.10 万亿元；2026E 0.61—0.82 万亿元</td><td>需求侧货币化尺度（测算）</td></tr>
+    <tr><td>2030 展望</td><td>全球年新增 864GW；中国累计 2.0—2.5TW</td><td>CPIA / "十五五"目标倒推（M015/M003）</td></tr>
+  </table>
+  <div class="callout warn"><b>情景敏感性：</b>中国 2026 三情景 150 / 200 / 240GW（保守/中性/乐观）。装机对"机制电价 × 自用比例"最敏感——机制电价每下探 0.05 元/kWh，中部省份 IRR 约收窄 1—1.5pct。</div>
+</section>
+
+<section id="s3">
+  <h2>产业链结构与运行</h2>
+  <p class="desc">中国占全球制造份额：多晶硅 85%+、硅片 97%、电池 85%、组件 75%（M065）。瓶颈已从"硅料稀缺"迁移至"消纳与贸易认证"。</p>
+  <div class="chart-box"><h3 style="margin-top:2px">2026 年产业链价格过山车（关键节点）</h3><div id="c2"></div>
+    <div class="legend"><span><i style="background:#8a5fc0"></i>多晶硅（元/kg）</span><span><i style="background:#2b6cb0"></i>电池片 TOPCon（元/W，右轴）</span><span><i style="background:#c78a1e"></i>组件（元/W，右轴）</span></div>
+  </div>
+  <div class="grid2">
+    <div>
+      <h3>2026H1 各环节开工率与产量</h3>
+      <table>
+        <tr><th>环节</th><th>产量</th><th>同比</th><th>开工率</th></tr>
+        <tr><td>多晶硅</td><td>53.15 万吨</td><td>−4.8%</td><td>30—33%</td></tr>
+        <tr><td>硅片</td><td>291 GW</td><td>−7.2%</td><td>44—53%</td></tr>
+        <tr><td>电池片</td><td>265 GW</td><td>−14.8%</td><td>40—59%</td></tr>
+        <tr><td>组件</td><td>205 GW</td><td>−29.7%</td><td>32—43%</td></tr>
+      </table>
+      <p class="desc" style="margin-top:4px">M006/M011。库存：硅料 54 万吨+、硅片约 25GW、电池约 8 天（M010）。</p>
+    </div>
+    <div>
+      <h3>权力关系轮转</h3>
+      <ul class="pts">
+        <li><b>2021—22</b>：硅料是瓶颈（全链 80—90% 利润集中于此，M061）</li>
+        <li><b>2023—25</b>：供给释放，硅料跌为最弱环节</li>
+        <li><b>2026</b>：终端电站最强（集采压价）但被电价市场化反噬</li>
+        <li><b>价值迁移</b>：硅料 → 逆变器/储能与辅材（玻璃、胶膜、银浆、设备寡头盈利稳定）</li>
+        <li><b>每 100 元组件收款</b>：上游约 32 元 / 电池约 42 元 / 封装约 26 元——分配从"资源租金"变为"加工费竞争"</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="s4">
+  <h2>主要商业模式</h2>
+  <p class="desc">六类模式的关键差异：付款方与使用方是否分离、谁垫资、现金回收周期、收益由政策还是市场定价。</p>
+  <div class="chart-box"><h3 style="margin-top:2px">收益模式光谱：付款方分离度 × 2026 年现金流状态</h3><div id="c3"></div></div>
+  <h3>136 号文如何改写收益模型</h3>
+  <table>
+    <tr><th>维度</th><th>旧模型（136 号文前）</th><th>新模型（全面入市后）</th></tr>
+    <tr><td>电价</td><td>燃煤基准价兜底（约 0.39 元/kWh）</td><td>机制电价竞价 0.15—0.4155 元/kWh + 现货</td></tr>
+    <tr><td>分布式</td><td>全额上网可行</td><td>一般工商业禁止全额上网；余电上网≤50%（辽宁细则）</td></tr>
+    <tr><td>收益率</td><td>央企分布式 ≥7%</td><td>约 6.5%；项目终止频发（352MW/313MW 案例，M030）</td></tr>
+    <tr><td>胜负手</td><td>屋顶资源、指标</td><td>自用比例与负荷质量（自用比例 +10pct ≈ 综合电价 +0.03—0.05 元）</td></tr>
+  </table>
+  <div class="callout"><b>新场景（萌芽期）：</b>绿电直连项目审批超百个、对应装机超 3000 万千瓦（C 级口径）；数据中心场景全投资 IRR 10—12%（个案测算，D/C 级，M053/M055）。绿证财务价值小（5.51 元/张）但 CBAM/RE100 合规价值真实（M054）。</div>
+</section>
+
+<section id="s5">
+  <h2>市场竞争格局</h2>
+  <p class="desc">2025 年全球组件出货（InfoLink，含美国工厂）：晶科与隆基并列第一，前四占上榜总量的 58%。</p>
+  <div class="chart-box"><h3 style="margin-top:2px">2025 全球组件出货 TOP10（GW）</h3><div id="c4"></div></div>
+  <div class="grid2">
+    <div>
+      <h3>盈利分化（2025）</h3>
+      <ul class="pts">
+        <li>组件 TOP10 仅横店东磁、阿特斯盈利</li>
+        <li>晶科/天合/隆基/晶澳合计净亏 <b style="color:var(--red)">249.41 亿元</b>（M020）</li>
+        <li>四家组件毛利率全部为负（−0.82%〜−4.03%）</li>
+        <li>利润锚：储能（阳光 134.61 亿净利）、海外（阿特斯境外收入 88.6%）、技术差异化（隆基 BC）</li>
+      </ul>
+    </div>
+    <div>
+      <h3>战略群组与技术站队</h3>
+      <ul class="pts">
+        <li>一体化（晶科/隆基/天合/晶澳/通威）vs 专业化（钧达/爱旭/福斯特/迈为/阳光）</li>
+        <li>TOPCon 系出货占比约 95%；隆基 BC 2026H1 占比 65%+、爱旭 ABC 出货 +132%（M040/M020）</li>
+        <li>出海：东南亚通道被双反封堵 → 四龙头出售美国工厂 → 中东建厂（晶科沙特 10GW）</li>
+        <li>出清：能耗国标预计出清 153.6GW（约 15%）；CR5 约 55% → 70%+（展望性判断）</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="s6">
+  <h2>政策与外部环境（PEST）</h2>
+  <p class="desc">政策主线：市场化改革（136 号文）＋ 反内卷治理 ＋ 需求配套（绿电直连/就近消纳）＋ 贸易壁垒应对。</p>
+  <h3>2025—2026 政策时间线</h3>
+  <table>
+    <tr><th>时间</th><th>政策/事件</th><th>要点</th></tr>
+    <tr><td>2025.01</td><td>分布式光伏管理办法</td><td>一般工商业禁止全额上网</td></tr>
+    <tr><td>2025.02</td><td>136 号文</td><td>全面入市+差价结算；2025.6.1 划分存量/增量；取消强制配储</td></tr>
+    <tr><td>2025.05</td><td>650 号文</td><td>绿电直连：自用 ≥60% 发电量 / ≥30% 用电量</td></tr>
+    <tr><td>2026.01</td><td>欧盟 CBAM 起征；工信部座谈会</td><td>碳成本约 600—1000 万元/GW；"反内卷"定调</td></tr>
+    <tr><td>2026.04.01</td><td>出口退税取消</td><td>光伏产品增值税出口退税 9%→0</td></tr>
+    <tr><td>2026.05</td><td>688 号文</td><td>多用户绿电直连；园区级放开</td></tr>
+    <tr><td>2026.07.27</td><td>《光伏行业成本核算模型通则》</td><td>统一成本口径，"低于成本中标"可执法</td></tr>
+    <tr><td>2026.07</td><td>能耗能效强制性国标</td><td>TOPCon/HJT ≥23.2%、BC ≥23.5%，2027.1.1 实施</td></tr>
+    <tr><td>2026.08</td><td>42 号令施行</td><td>不得限制跨省区交易与绿证交易</td></tr>
+  </table>
+  <div class="grid2">
+    <div><h3>消纳：系统性瓶颈</h3>
+      <ul class="pts">
+        <li>利用率 96.8%（2024）→ 91.4%（2026H1）</li>
+        <li>青海弃光 21.3%、西藏 39.2%、新疆 14.4%（M057）</li>
+        <li>负电价：12 省 1200 小时+，最低 −0.35 元/kWh（M058）</li>
+        <li>机制电价下限：新疆 0.15 / 宁夏 0.18 元/kWh，低于全生命周期成本（M059）</li>
+        <li>2023 年强制配储项目利用率仅 17%——"建而不用"（M057）</li>
+      </ul></div>
+    <div><h3>贸易壁垒（截至 2026-09）</h3>
+      <ul class="pts">
+        <li>美国：东南亚四国双反终裁（柬最高 3521%）；TOPCon 337 调查；UFLPA 扣留 34 亿美元；对印/印尼/老挝终裁最高 249.13%</li>
+        <li>美国政策反复：IEEPA 关税被裁定违法，转征 15% 全球关税（M044）</li>
+        <li>欧盟：CBAM 起征 + NZIA（2030 本土产能 40%、招标 30% 非价格标准）</li>
+        <li>应对：中东建厂（成本比东南亚低约 15%）、专利池、碳足迹合规</li>
+      </ul></div>
+  </div>
+</section>
+
+<section id="s7">
+  <h2>趋势阶段与判断</h2>
+  <p class="desc">周期定位：出清早期，"政策驱动型弱再平衡"——不是 V 型反转。</p>
+  <div class="chart-box"><h3 style="margin-top:2px">技术路线坐标：量产效率 vs 理论极限（%）</h3><div id="c5"></div></div>
+  <div class="callout"><b>价格反弹的性质（分歧裁定）：</b>8—9 月硅料 33→46 元/kg 的反弹由"减产挺价+海外备货"驱动；但库存未去化（54 万吨+）、成交清淡、硅片/电池价格已从 8 月高点回落（1.12→1.02 元/片、0.38→0.30 元/W，M010）。<b>结论：阶段性修复成立，趋势反转证据不足。</b></div>
+  <h3>确认反转的条件 vs 证伪信号</h3>
+  <table>
+    <tr><th>确认反转（需多数满足）</th><th>证伪信号（任一出现即警惕）</th></tr>
+    <tr><td>硅料库存降至 30 万吨以下且成交放量</td><td>减产协同破裂（任一头部大幅提产）</td></tr>
+    <tr><td>2027 国标执行后实际关停 ≥100GW</td><td>Q4 海外备货退潮后价格再创新低</td></tr>
+    <tr><td>机制电价竞价下限止跌回升</td><td>2027 国标执行宽松</td></tr>
+    <tr><td>组件站稳 0.75 元/W 且全链正毛利</td><td>负电价时长扩大、机制电价再探底</td></tr>
+  </table>
+  <h3>2027 情景推演</h3>
+  <ul class="pts">
+    <li><b>基准</b>：国标如期执行、出清 100—150GW；中国 220—260GW 转正、全球 650—700GW；主链恢复微利</li>
+    <li><b>悲观</b>：协同破裂/需求二次探底，中国 &lt;180GW，二线一体化债务重组，出清延至 2028</li>
+    <li><b>乐观</b>：算电协同超预期+海外补库，全球 &gt;680GW，2026Q4 确认拐点</li>
+  </ul>
+</section>
+
+<section id="s8">
+  <h2>行业痛点（按承担者）</h2>
+  <div class="grid2">
+    <div><h3>五组痛点</h3>
+      <ul class="pts">
+        <li><b>制造企业</b>：亏损面 22/26 家、183—214 亿；电池跌破现金成本线；库存高企</li>
+        <li><b>电站投资商</b>：IRR 7%→6.5%；负电价与机制电价下限击穿收益模型</li>
+        <li><b>分布式运营商</b>：机制电量仅占 7%、EMC 重谈风险；自用型几乎免疫（分化）</li>
+        <li><b>电网/系统</b>：装机第一 vs 电量 13%；弃光与灵活性欠账是共同放大器</li>
+        <li><b>出海企业</b>：双反+337+CBAM+退税取消；合规能力决定分群</li>
+      </ul></div>
+    <div><h3>痛点 → 机会边界</h3>
+      <ul class="pts">
+        <li>消纳瓶颈成立 → 储能/构网型/虚拟电厂稀缺（前提：容量补偿定价）</li>
+        <li>收益不确定 → 电力交易成新专业环节</li>
+        <li>贸易壁垒 → 中东/合规产能稀缺（前提：政策不再反转）</li>
+        <li>装机≠电量 → 可调度光伏（光储一体/光热/制氢）为长期方向（早期）</li>
+      </ul></div>
+  </div>
+  <div class="chart-box"><h3 style="margin-top:2px">痛点损失速览（关键量化）</h3><div id="c6"></div></div>
+</section>
+
+<footer>
+  <div class="disc"><b>免责声明：</b>本报告基于截至 2026 年 9 月 17 日的公开信息编制，仅供研究参考，不构成任何投资建议或商业决策依据。预测性内容均标注机构与区间口径，存在不确定性；引用数据以原始来源为准。使用者据此操作，风险自担。</div>
+  <p style="margin-top:10px">数据来源编号（M001—M067）与完整方法说明见《20260917_光伏行业_文本研究报告.md》及材料索引 ｜ 生成：WorkBuddy 行研组合（hehe-industry-researcher + 八大专项 Skill）</p>
+</footer>
+<div class="tooltip" id="tip"></div>
+</div>
+
+<script>
+var tip=document.getElementById('tip');
+var nav=document.getElementById('nav');
+nav.addEventListener('click',function(e){
+  var b=e.target.closest('button');if(!b)return;
+  nav.querySelectorAll('button').forEach(function(x){x.classList.remove('on')});
+  b.classList.add('on');
+  document.querySelectorAll('section').forEach(function(s){s.classList.remove('on')});
+  document.getElementById(b.getAttribute('data-t')).classList.add('on');
+  window.scrollTo({top:0,behavior:'smooth'});
+});
+function bindTip(el){
+  el.addEventListener('mousemove',function(e){tip.style.opacity=1;tip.style.left=(e.pageX+14)+'px';tip.style.top=(e.pageY-32)+'px';});
+  el.addEventListener('mouseout',function(){tip.style.opacity=0;});
+}
+var NS='http://www.w3.org/2000/svg';
+function svgBox(w,h){var s=document.createElementNS(NS,'svg');s.setAttribute('viewBox','0 0 '+w+' '+h);return s;}
+function txt(s,x,y,t,fs,fill,anchor,weight){var e=document.createElementNS(NS,'text');
+  e.setAttribute('x',x);e.setAttribute('y',y);e.setAttribute('font-size',fs||12);e.setAttribute('fill',fill||'#5b6472');
+  if(anchor)e.setAttribute('text-anchor',anchor);if(weight)e.setAttribute('font-weight',weight);e.textContent=t;s.appendChild(e);return e;}
+function rect(s,x,y,w,h,fill,rx,tipText){var e=document.createElementNS(NS,'rect');
+  e.setAttribute('x',x);e.setAttribute('y',y);e.setAttribute('width',w);e.setAttribute('height',h);e.setAttribute('fill',fill);e.setAttribute('rx',rx||3);
+  if(tipText){e.addEventListener('mouseenter',function(ev){tip.textContent=tipText;tip.style.opacity=1;});e.addEventListener('mouseleave',function(){tip.style.opacity=0;});}
+  s.appendChild(e);return e;}
+function line(s,x1,y1,x2,y2,stroke,dash,w){var e=document.createElementNS(NS,'line');
+  e.setAttribute('x1',x1);e.setAttribute('y1',y1);e.setAttribute('x2',x2);e.setAttribute('y2',y2);e.setAttribute('stroke',stroke||'#e5e8ee');
+  if(dash)e.setAttribute('stroke-dasharray',dash);e.setAttribute('stroke-width',w||1);s.appendChild(e);return e;}
+function circle(s,cx,cy,r,fill,tipText){var e=document.createElementNS(NS,'circle');
+  e.setAttribute('cx',cx);e.setAttribute('cy',cy);e.setAttribute('r',r);e.setAttribute('fill',fill);
+  if(tipText){e.addEventListener('mouseenter',function(){tip.textContent=tipText;tip.style.opacity=1;});e.addEventListener('mouseleave',function(){tip.style.opacity=0;});}
+  s.appendChild(e);return e;}
+function path(s,d,stroke,w,fill,dash){var e=document.createElementNS(NS,'path');
+  e.setAttribute('d',d);e.setAttribute('fill',fill||'none');e.setAttribute('stroke',stroke);e.setAttribute('stroke-width',w||2);
+  e.setAttribute('stroke-linejoin','round');e.setAttribute('stroke-linecap','round');
+  if(dash)e.setAttribute('stroke-dasharray',dash);s.appendChild(e);return e;}
+function mount(id,svg){var host=document.getElementById(id);host.appendChild(svg);bindTip(host);}
+
+/* C0 中国历年新增装机 */
+(function(){
+  var data=[['2021',54.88],['2022',87.41],['2023',216.88],['2024',277.17],['2025',316.6],['2026E',200]];
+  var W=1000,H=330,L=56,B=54,T=26,maxV=360,bw=(W-L-30)/6;
+  var s=svgBox(W,H);
+  for(var v=0;v<=maxV;v+=90){var y=H-B-(v/maxV)*(H-B-T);line(s,L,y,W-16,y);txt(s,L-8,y+4,v,11,'#98a0ac','end');}
+  data.forEach(function(d,i){
+    var x=L+i*bw+bw*0.2,bh=(d[1]/maxV)*(H-B-T),y=H-B-bh;
+    var col=i===5?'#7ea8d4':'#2b6cb0';
+    rect(s,x,y,bw*0.6,bh,col,4,d[0]+'：'+d[1]+' GW'+(i===5?'（预测中枢，区间180—240）':''));
+    txt(s,x+bw*0.3,y-6,d[1],12,i===5?'#5b8ec4':'#24405e','middle','700');
+    txt(s,x+bw*0.3,H-B+18,d[0],12.5,'#5b6472','middle');
+  });
+  txt(s,L-8,T-6,'GW',11,'#98a0ac','end');
+  mount('c0',s);
+})();
+
+/* C1 2026 预测机构对比 */
+(function(){
+  var rows=[['CPIA·王勃华（全球）',612,'#2b6cb0'],['CRU（全球）',590,'#2b6cb0'],['券商乐观（全球）',675,'#9db9d9'],['InfoLink（中国）',195,'#1d9e6f'],['Mysteel 中性（中国）',180,'#1d9e6f'],['券商中性（中国）',200,'#1d9e6f'],['券商乐观（中国）',240,'#1d9e6f']];
+  var W=1000,H=300,L=180,B=46,T=20,maxV=720,rh=(H-T-B)/rows.length;
+  var s=svgBox(W,H);
+  for(var v=0;v<=maxV;v+=120){var x=L+(v/maxV)*(W-L-40);line(s,x,T,W,x,v);if(v>0)txt(s,x+4,T+2,v,10,'#98a0ac');}
+  txt(s,W-36,T-4,'GW',10,'#98a0ac');
+  rows.forEach(function(d,i){
+    var y=T+i*rh+rh*0.2,bw2=(d[1]/maxV)*(W-L-40);
+    txt(s,L-10,y+rh*0.42,d[0],12,'#3a4453','end');
+    rect(s,L,y,bw2,rh*0.55,d[2],4,d[0]+'：约 '+d[1]+' GW');
+    txt(s,L+bw2+8,y+rh*0.45,d[1],12,'#3a4453',null,'700');
+  });
+  line(s,L+(600/maxV)*(W-L-40),T-8,L+(600/maxV)*(W-L-40),H-B,'#c78a1e','5,4',1.5);
+  txt(s,L+(600/maxV)*(W-L-40)+6,T+12,'全球中枢≈600',11,'#c78a1e','start','700');
+  txt(s,30,14,'蓝=全球预测  绿=中国预测',11.5,'#5b6472');
+  mount('c1',s);
+})();
+
+/* C2 产业链价格过山车（双轴） */
+(function(){
+  var pts=['1月','3月','5月','7月初','8月','9月'];
+  var poly=[55,42,36,32.5,38,46];      /* 元/kg */
+  var cell=[0.39,0.34,0.30,0.29,0.38,0.30]; /* 元/W */
+  var mod=[0.78,0.74,0.72,0.70,0.72,0.72];
+  var W=1000,H=340,L=64,R=64,B=48,T=30,maxP=60,maxC=0.45;
+  var s=svgBox(W,H);
+  function px(i){return L+i*((W-L-R)/(pts.length-1));}
+  function pyP(v){return H-B-(v/maxP)*(H-B-T);}
+  function pyC(v){return H-B-(v/maxC)*(H-B-T);}
+  for(var v=0;v<=maxP;v+=15){var y=pyP(v);line(s,L,y,W-R,y);txt(s,L-8,y+4,v,11,'#98a0ac','end');}
+  for(var i2=0;i2<0.45;i2+=0.15){txt(s,W-R+8,pyC(i2)+4,(i2.toFixed(2)),10,'#b58a2a');}
+  for(var i3=0;i3<pts.length;i3++){txt(s,px(i3),H-B+18,pts[i3],12,'#5b6472','middle');}
+  var dP=pts.map(function(p,i){return (i?'L':'M')+px(i)+','+pyP(poly[i]);}).join(' ');
+  path(s,dP,'#8a5fc0',2.5);
+  var dC=pts.map(function(p,i){return (i?'L':'M')+px(i)+','+pyC(cell[i]);}).join(' ');
+  var dM=pts.map(function(p,i){return (i?'L':'M')+px(i)+','+pyC(mod[i]);}).join(' ');
+  path(s,dC,'#2b6cb0',2);path(s,dM,'#c78a1e',2);
+  pts.forEach(function(p,i){
+    circle(s,px(i),pyP(poly[i]),4.5,'#8a5fc0','多晶硅 '+poly[i]+' 元/kg（'+p+'）');
+    circle(s,px(i),pyC(cell[i]),4.5,'#2b6cb0','TOPCon 电池 '+cell[i]+' 元/W（'+p+'）');
+    circle(s,px(i),pyC(mod[i]),4.5,'#c78a1e','组件 '+mod[i]+' 元/W（'+p+'）');
+  });
+  txt(s,L-8,T-8,'元/kg',10,'#8a5fc0','end');
+  txt(s,W-R+8,T+2,'元/W',10,'#b58a2a');
+  txt(s,W/2,T-12,'左轴：多晶硅 ｜ 右轴：电池/组件（1—9 月关键节点，M006/M007/M008/M010）',10.5,'#98a0ac','middle');
+  mount('c2',s);
+})();
+
+/* C3 商业模式光谱 */
+(function(){
+  var rows=[
+    ['制造一体化',4.2,'全链亏损·拼成本与海外','#d5453c'],
+    ['专业化电池',3.6,'贴线·技术溢价突围','#e07b54'],
+    ['电站/EPC',3.0,'收益重定价 IRR 7→6.5%','#c78a1e'],
+    ['分布式 EMC',2.2,'分化·自用型健康','#7a9a3a'],
+    ['逆变器/光储',1.4,'高盈利·储能第二曲线','#1d9e6f'],
+    ['绿电直连/综合能源',1.0,'萌芽·新场景 IRR 8-12%','#2b8f85']];
+  var W=1000,H=310,L=190,B=70,T=24,maxX=5;
+  var s=svgBox(W,H);
+  line(s,L,T,L,H-B,'#e5e8ee',null,1.5);
+  txt(s,L/2-40,H-B+26,'← 使用方=付款方（合一）',12,'#1d9e6f','middle','700');
+  txt(s,L+(W-L-20)/2+40,H-B+26,'电网/市场为付款方（分离）→',12,'#d5453c','middle','700');
+  rows.forEach(function(d,i){
+    var y=T+i*((H-B-T)/rows.length)+8;
+    var x=L+(d[1]/maxX)*(W-L-30);
+    rect(s,L,y,x-L,(H-B-T)/rows.length-10,d[3],4,d[0]+'｜'+d[2]);
+    txt(s,L+12,y+22,d[0],13,'#ffffff','start','700');
+    txt(s,x+10,y+22,d[2],11.5,'#5b6472');
+  });
+  mount('c3',s);
+})();
+
+/* C4 组件出货 TOP10 */
+(function(){
+  var data=[['晶科能源',86.8],['隆基绿能',86.58],['天合光能',67.88],['晶澳科技',66.53],['通威股份',43.25],['正泰新能',35.6],['协鑫集成',25.28],['横店东磁',24.9],['阿特斯',24.3],['TCL中环',15.1]];
+  var W=1000,H=360,L=96,B=46,T=20,maxV=100,rh=(H-T-B)/10;
+  var s=svgBox(W,H);
+  for(var v=0;v<=maxV;v+=20){var x=L+(v/maxV)*(W-L-46);line(s,x,T,x,H-B,v);if(v>0)txt(s,x+4,T+10,v,10,'#98a0ac');}
+  txt(s,W-40,T+2,'GW',10,'#98a0ac');
+  data.forEach(function(d,i){
+    var y=T+i*rh+rh*0.15,bw=(d[1]/maxV)*(W-L-46);
+    var col=i<2?'#2b6cb0':(i<4?'#4a83c4':(i<6?'#7ea8d4':'#a9c4e2'));
+    txt(s,L-8,y+rh*0.5,d[0],12,'#3a4453','end');
+    rect(s,L,y,bw,rh*0.62,col,3,d[0]+'：'+d[1]+' GW（2025，InfoLink）');
+    txt(s,L+bw+8,y+rh*0.55,d[1],12,'#3a4453',null,'700');
+  });
+  txt(s,20,12,'深蓝=并列第一梯队 ｜ 前四合计占上榜总出货（536GW）的 58%',11.5,'#5b6472');
+  mount('c4',s);
+})();
+
+/* C5 技术路线效率坐标 */
+(function(){
+  var tech=[['PERC',23.5,24.5,'#b0b8c4'],['TOPCon',26.0,28.7,'#2b6cb0'],['HJT',26.5,29.2,'#1d9e6f'],['BC',26.9,29.1,'#c78a1e'],['钙钛矿叠层(实验室)',34.6,43.0,'#8a5fc0']];
+  var W=1000,H=330,L=70,B=56,T=30,maxV=46;
+  var s=svgBox(W,H);
+  for(var v=20;v<=maxV;v+=5){var y=H-B-((v-20)/26)*(H-B-T);line(s,L,y,W-20,y);txt(s,L-8,y+4,v,11,'#98a0ac','end');}
+  line(s,L,H-B-((29.4-20)/26)*(H-B-T),W-20,H-B-((29.4-20)/26)*(H-B-T),'#d5453c','6,4',1.5);
+  txt(s,W-24,H-B-((29.4-20)/26)*(H-B-T)-6,'晶硅单结理论极限 29.4%',11,'#d5453c','end','700');
+  tech.forEach(function(d,i){
+    var cx=L+80+i*((W-L-140)/(tech.length-1));
+    var yQ=H-B-((d[1]-20)/26)*(H-B-T), yT=H-B-((d[2]-20)/26)*(H-B-T);
+    line(s,cx,yQ,cx,yT,'#d8dde6',null,3);
+    circle(s,cx,yQ,7,d[3],'量产效率：'+d[1]+'%');
+    circle(s,cx,yT,4.5,'#ffffff',d[0]+' 理论极限：'+d[2]+'%').setAttribute('stroke',d[3]);
+    circle(s,cx,yT,4.5,'none').setAttribute('stroke',d[3]);
+    circle(s,cx,yT,4,'none');
+    txt(s,cx,H-B+20,d[0],12,'#3a4453','middle');
+    txt(s,cx+14,yQ-10,d[1]+'%',11.5,d[3],'start','700');
+  });
+  txt(s,20,14,'实心=2026 量产效率 ｜ 空心=理论极限（M036—M040）',11.5,'#98a0ac');
+  mount('c5',s);
+})();
+
+/* C6 痛点损失速览 */
+(function(){
+  var rows=[
+    ['制造亏损 2026H1',210,'亿元（区间183—214）','#d5453c',300],
+    ['四龙头净亏 2025',249.41,'亿元（晶科/天合/隆基/晶澳）','#d5453c',300],
+    ['弃光电量 2026H1(约)',620,'亿 kWh（按利用率缺口推算）','#c78a1e',700],
+    ['UFLPA 扣留(累计)',34,'亿美元（2022.6—2026.4）','#8a5fc0',120],
+    ['CBAM 新增成本',8,'百万元/GW（600—1000 万区间）','#2b6cb0',20]];
+  var W=1000,H=300,L=210,B=46,T=20;
+  var s=svgBox(W,H);
+  rows.forEach(function(d,i){
+    var y=T+i*((H-T-B)/5)+10,bw=(d[3]/d[4])*(W-L-90);
+    txt(s,L-10,y+22,d[0],12.5,'#3a4453','end','700');
+    rect(s,L,y,bw,(H-T-B)/5-16,d[3],4,d[0]+'：'+d[2]);
+    txt(s,L+bw+8,y+24,d[1],12.5,'#3a4453',null,'700');
+  });
+  txt(s,20,14,'量化口径均为区间/推算的，详见专项报告与材料索引',11.5,'#98a0ac');
+  mount('c6',s);
+})();
+</script>
+</body>
+</html>
