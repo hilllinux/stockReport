@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>宇通客车 (600066.SH) · 六维基本面与布林通道深度诊断报告</title>
+<style>
+  :root {
+    --bg: #0b1120;
+    --surface: #151f32;
+    --surface-card: #182338;
+    --surface-hover: #22314d;
+    --border: #2b3952;
+    --border-light: rgba(255, 255, 255, 0.08);
+    --text-main: #f8fafc;
+    --text-muted: #94a3b8;
+    --text-dim: #64748b;
+    --up: #f43f5e;       /* A股涨-红/玫瑰红 */
+    --up-bg: rgba(244, 63, 94, 0.12);
+    --up-border: rgba(244, 63, 94, 0.35);
+    --down: #10b981;     /* A股跌-绿/翡翠绿 */
+    --down-bg: rgba(16, 185, 129, 0.12);
+    --down-border: rgba(16, 185, 129, 0.35);
+    --warn: #f59e0b;     /* 黄灯预警 */
+    --warn-bg: rgba(245, 158, 11, 0.12);
+    --warn-border: rgba(245, 158, 11, 0.35);
+    --accent: #38bdf8;   /* 亮蓝 */
+    --accent-glow: rgba(56, 189, 248, 0.2);
+    --purple: #a855f7;
+    --radius-sm: 8px;
+    --radius-md: 14px;
+    --radius-lg: 20px;
+    --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.45), 0 8px 10px -6px rgba(0, 0, 0, 0.35);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background-color: var(--bg);
+    color: var(--text-main);
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+    line-height: 1.6;
+    padding: 32px 16px;
+    background-image: 
+      radial-gradient(at 0% 0%, rgba(56, 189, 248, 0.08) 0px, transparent 50%),
+      radial-gradient(at 100% 100%, rgba(168, 85, 247, 0.06) 0px, transparent 50%);
+    min-height: 100vh;
+  }
+
+  .container {
+    max-width: 1240px;
+    margin: 0 auto;
+  }
+
+  /* 顶部导航与标题区 */
+  header {
+    margin-bottom: 28px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  .title-group h1 {
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .stock-code {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--accent);
+    background: rgba(56, 189, 248, 0.12);
+    border: 1px solid rgba(56, 189, 248, 0.3);
+    padding: 3px 10px;
+    border-radius: 999px;
+  }
+  .subtitle {
+    color: var(--text-muted);
+    font-size: 14px;
+    margin-top: 6px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .badges-group {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .badge {
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text-muted);
+  }
+  .badge.baoyu {
+    background: linear-gradient(135deg, rgba(168, 85, 247, 0.15), rgba(56, 189, 248, 0.15));
+    border-color: rgba(168, 85, 247, 0.4);
+    color: #e2e8f0;
+  }
+
+  /* 便当盒 Bento Grid 核心布局 */
+  .bento-grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 18px;
+    margin-bottom: 24px;
+  }
+
+  .col-12 { grid-column: span 12; }
+  .col-8 { grid-column: span 8; }
+  .col-7 { grid-column: span 7; }
+  .col-6 { grid-column: span 6; }
+  .col-5 { grid-column: span 5; }
+  .col-4 { grid-column: span 4; }
+  .col-3 { grid-column: span 3; }
+
+  @media (max-width: 1024px) {
+    .col-8, .col-7, .col-5, .col-4, .col-3 { grid-column: span 6; }
+  }
+  @media (max-width: 720px) {
+    .col-8, .col-7, .col-6, .col-5, .col-4, .col-3 { grid-column: span 12; }
+  }
+
+  /* 卡片基类 */
+  .card {
+    background: var(--surface-card);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-md);
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    transition: transform 0.2s ease, border-color 0.2s ease;
+  }
+  .card:hover {
+    border-color: rgba(255, 255, 255, 0.18);
+  }
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+  }
+  .card-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text-main);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .card-title .icon {
+    font-size: 16px;
+  }
+  .status-pill {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 999px;
+  }
+  .pill-warn { background: var(--warn-bg); color: var(--warn); border: 1px solid var(--warn-border); }
+  .pill-danger { background: var(--up-bg); color: var(--up); border: 1px solid var(--up-border); }
+  .pill-good { background: var(--down-bg); color: var(--down); border: 1px solid var(--down-border); }
+  .pill-accent { background: rgba(56,189,248,0.12); color: var(--accent); border: 1px solid rgba(56,189,248,0.3); }
+
+  /* 顶部 4联 KPI 卡片 */
+  .kpi-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 18px;
+  }
+  .kpi-label {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: 500;
+  }
+  .kpi-num {
+    font-size: 26px;
+    font-weight: 800;
+    margin: 6px 0;
+    font-feature-settings: "tnum";
+    letter-spacing: -0.5px;
+  }
+  .kpi-sub {
+    font-size: 12px;
+    color: var(--text-dim);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  /* 颜色标注 */
+  .pos { color: var(--up); }
+  .neg { color: var(--down); }
+  .warn { color: var(--warn); }
+  .accent { color: var(--accent); }
+
+  /* 进度条 */
+  .progress-bar-bg {
+    background: var(--surface);
+    height: 6px;
+    border-radius: 999px;
+    overflow: hidden;
+    margin: 8px 0;
+    position: relative;
+  }
+  .progress-fill {
+    height: 100%;
+    border-radius: 999px;
+  }
+
+  /* 表格样式 */
+  .bento-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12.5px;
+    margin-top: 10px;
+  }
+  .bento-table th {
+    text-align: left;
+    color: var(--text-dim);
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--border);
+    font-weight: 600;
+  }
+  .bento-table td {
+    padding: 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    color: var(--text-main);
+  }
+  .bento-table tr:last-child td { border-bottom: none; }
+  .bento-table tr:hover td { background: rgba(255, 255, 255, 0.02); }
+
+  /* 列表卡片 */
+  .insight-list {
+    list-style: none;
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+  .insight-list li {
+    position: relative;
+    padding-left: 18px;
+    margin-bottom: 10px;
+    line-height: 1.55;
+  }
+  .insight-list li::before {
+    content: "•";
+    position: absolute;
+    left: 0;
+    top: 0;
+    color: var(--accent);
+    font-size: 16px;
+  }
+  .insight-list li strong {
+    color: var(--text-main);
+  }
+
+  /* BOLL 技术面仪表盘 */
+  .boll-visual {
+    background: #111827;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 16px;
+    margin-top: 12px;
+  }
+  .channel-line {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    margin: 4px 0;
+    border-radius: 6px;
+    font-size: 12px;
+    font-family: monospace;
+  }
+  .ch-upper { background: rgba(244, 63, 94, 0.08); border-left: 3px solid var(--up); color: #fda4af; }
+  .ch-mid { background: rgba(56, 189, 248, 0.08); border-left: 3px solid var(--accent); color: #bae6fd; }
+  .ch-lower { background: rgba(16, 185, 129, 0.08); border-left: 3px solid var(--down); color: #a7f3d0; }
+  .ch-current { background: rgba(245, 158, 11, 0.15); border-left: 3px solid var(--warn); color: #fde68a; font-weight: bold; }
+
+  /* 原生 Canvas 图表容器 */
+  .chart-canvas-wrap {
+    position: relative;
+    width: 100%;
+    height: 180px;
+    margin-top: 12px;
+  }
+  canvas {
+    width: 100% !important;
+    height: 100% !important;
+    display: block;
+  }
+
+  /* 底部免责声明 */
+  footer {
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+    color: var(--text-dim);
+    font-size: 12px;
+    line-height: 1.7;
+  }
+  .disclaimer-badge {
+    display: inline-block;
+    color: var(--warn);
+    border: 1px solid var(--warn-border);
+    background: var(--warn-bg);
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: bold;
+    margin-bottom: 8px;
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <!-- 头部 -->
+  <header>
+    <div class="title-group">
+      <h1>宇通客车 <span class="stock-code">600066.SH</span> 深度研报</h1>
+      <div class="subtitle">
+        <span>数据基准：2026 年半年度报告 + 8月产销快报 + 2026-09-21 盘中行情</span>
+        <span>•</span>
+        <span>归母净利 18.67 亿 / 扣非 17.96 亿 (+15.83%)</span>
+        <span>•</span>
+        <span>总市值 569.65 亿元</span>
+      </div>
+    </div>
+    <div class="badges-group">
+      <span class="badge baoyu">✨ Baoyu Bento-Grid 架构</span>
+      <span class="badge">六维基本面模型</span>
+      <span class="badge">BOLL (20,2) 超卖沙盘</span>
+      <span class="badge">出海与高红利透视</span>
+    </div>
+  </header>
+
+  <!-- 第一行：顶层核心 KPI Bento 卡片 (4格) -->
+  <div class="bento-grid">
+    <div class="card kpi-card col-3">
+      <div>
+        <div class="kpi-label">最新股价 · PE / PB 估值底</div>
+        <div class="kpi-num accent">25.73 <span style="font-size:14px;font-weight:normal;color:var(--text-dim);">元</span></div>
+      </div>
+      <div class="kpi-sub">
+        <span>PE(TTM): 10.38x</span>
+        <span>PB: 4.39x</span>
+      </div>
+      <div style="margin-top:10px;">
+        <div style="font-size:11px;color:var(--text-dim);display:flex;justify-content:space-between;">
+          <span>52周低 24.66</span>
+          <span class="warn">探底回升 (YTD -16.2%)</span>
+          <span>52周高 36.50</span>
+        </div>
+        <div class="progress-bar-bg">
+          <div class="progress-fill" style="width: 9.0%; background: var(--warn);"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card kpi-card col-3">
+      <div>
+        <div class="kpi-label">2026 H1 扣非净利 · 主业高增</div>
+        <div class="kpi-num pos">17.96 <span style="font-size:14px;font-weight:normal;color:var(--text-dim);">亿元</span></div>
+      </div>
+      <div class="kpi-sub">
+        <span>扣非同比: <b class="pos">+15.83%</b></span>
+        <span>表观归母: -3.52%</span>
+      </div>
+      <div style="margin-top:10px;">
+        <div style="font-size:11px;color:var(--text-dim);display:flex;justify-content:space-between;">
+          <span>Q1 扣非同比微降</span>
+          <span class="pos">Q2 扣非暴增 +30.9% (强拐点)</span>
+        </div>
+        <div class="progress-bar-bg">
+          <div class="progress-fill" style="width: 82%; background: var(--up);"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card kpi-card col-3">
+      <div>
+        <div class="kpi-label">现金奶牛 · 类现金覆盖率</div>
+        <div class="kpi-num" style="color:#38bdf8;">29.0 <span style="font-size:14px;font-weight:normal;color:var(--text-dim);">倍</span></div>
+      </div>
+      <div class="kpi-sub">
+        <span>货币及理财: 60.95 亿</span>
+        <span>有息负债仅: 2.10 亿</span>
+      </div>
+      <div style="margin-top:10px;">
+        <div style="font-size:11px;color:var(--down);display:flex;justify-content:space-between;">
+          <span>H1 经营现金流净额</span>
+          <span style="font-weight:bold;">59.49 亿元 (+247%)</span>
+        </div>
+        <div class="progress-bar-bg">
+          <div class="progress-fill" style="width: 98%; background: var(--down);"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card kpi-card col-3">
+      <div>
+        <div class="kpi-label">股东回报 · TTM 股息率</div>
+        <div class="kpi-num pos">7.77%</div>
+      </div>
+      <div class="kpi-sub">
+        <span>2025分红率: 99.65%</span>
+        <span>10派20元 (44.28亿)</span>
+      </div>
+      <div style="margin-top:10px;">
+        <div style="font-size:11px;color:var(--text-dim);display:flex;justify-content:space-between;">
+          <span>近3年累计派现 121.8亿</span>
+          <span>募资比 515%</span>
+        </div>
+        <div class="progress-bar-bg">
+          <div class="progress-fill" style="width: 100%; background: var(--purple);"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 第二行：六维基本面拆解 (主业还原与分季度趋势) -->
+  <div class="bento-grid">
+    <!-- ① 主业还原与业务透视 8列大卡片 -->
+    <div class="card col-8">
+      <div class="card-header">
+        <div class="card-title">
+          <span class="icon">🔍</span>
+          <span>① 剔除噪音还原主业：表观微降背后的“主业强劲改善”</span>
+        </div>
+        <span class="status-pill pill-good">扣非+15.8%</span>
+      </div>
+
+      <p style="font-size:13px;color:var(--text-muted);margin-bottom:12px;">
+        宇通客车上半年呈现典型的<strong>“表观利润微降、扣非主业高增”</strong>反差格局。归母净利润 18.67 亿元（同比 -3.52%），主要系去年同期存在较大规模资产处置及减值冲回（高基数），叠加本期金融理财出现公允价值浮亏。<strong>剔除噪音后，扣非归母净利润达 17.96 亿元（+15.83%）</strong>，综合毛利率大幅攀升至 <strong>24.47% (+3.14pct)</strong>，核心盈利能力显著提升。
+      </p>
+
+      <table class="bento-table">
+        <thead>
+          <tr>
+            <th>产销及业务分部</th>
+            <th>2026 H1 数据</th>
+            <th>同比变动</th>
+            <th>结构特征</th>
+            <th>核心战略角色与盈利驱动</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong style="color:var(--accent);">海外出口总业务</strong></td>
+            <td>约 0.69 万辆</td>
+            <td class="pos">+14.0%</td>
+            <td>占比升至 34%</td>
+            <td><strong>量利齐升主引擎</strong>：海外毛利远超国内，单车收入升至 86.8 万元 (+10%)</td>
+          </tr>
+          <tr>
+            <td><strong style="color:var(--purple);">新能源客车出口</strong></td>
+            <td>1,654 辆</td>
+            <td class="pos">+54.1%</td>
+            <td>高价值爆发</td>
+            <td><strong>技术溢价先锋</strong>：欧洲RRF基金到期促放量，拉美/中东多国示范运营</td>
+          </tr>
+          <tr>
+            <td><strong>大中型客车 (7米以上)</strong></td>
+            <td>1.55 万辆</td>
+            <td class="neg">-11.6%</td>
+            <td>行业市占 37.1%</td>
+            <td><strong>国内压舱石</strong>：受公交8-12年长周期置换压制，市占稳居全行业第一</td>
+          </tr>
+          <tr>
+            <td><strong>轻型客车</strong></td>
+            <td>0.47 万辆</td>
+            <td class="pos">+21.4%</td>
+            <td>微循环放量</td>
+            <td><strong>结构转型抓手</strong>：网约公交、景区园区与微循环巴士对冲大客车萎缩</td>
+          </tr>
+          <tr>
+            <td><strong>主营业务收入</strong></td>
+            <td>148.28 亿元</td>
+            <td>占比 88.69%</td>
+            <td>高集中度</td>
+            <td>客车与零部件制造纯粹主业，无跨界多元化拖累</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- 营收 vs 毛利趋势 Canvas 图 -->
+      <div class="chart-canvas-wrap" style="height:150px;">
+        <canvas id="businessTrendChart"></canvas>
+      </div>
+      <div style="font-size:11px;color:var(--text-dim);text-align:right;margin-top:4px;">图1：宇通客车分季度扣非净利润与毛利率攀升趋势</div>
+    </div>
+
+    <!-- ② 分季度拐点与8月产销 4列卡片 -->
+    <div class="card col-4">
+      <div class="card-header">
+        <div class="card-title">
+          <span class="icon">⏱️</span>
+          <span>② 分季度拐点与最新产销警示</span>
+        </div>
+        <span class="status-pill pill-warn">产销分化</span>
+      </div>
+
+      <div style="background:var(--surface);padding:12px;border-radius:var(--radius-sm);margin-bottom:12px;">
+        <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text-muted);margin-bottom:4px;">
+          <span>Q1 扣非净利: 6.07 亿</span>
+          <span style="color:var(--text-dim);">-12.7% (低谷)</span>
+        </div>
+        <div class="progress-bar-bg">
+          <div class="progress-fill" style="width: 35%; background: var(--text-dim);"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text-muted);margin-top:10px;margin-bottom:4px;">
+          <span>Q2 扣非净利: 11.88 亿</span>
+          <span class="pos">+30.9% (强劲拐点)</span>
+        </div>
+        <div class="progress-bar-bg">
+          <div class="progress-fill" style="width: 95%; background: var(--up);"></div>
+        </div>
+      </div>
+
+      <ul class="insight-list">
+        <li><strong>Q2 单季强劲反转</strong>：Q2 营收 108.1 亿 (+11.3%)，扣非归母净利 11.88 亿 (+30.9%)，毛利率爬升至 <strong>24.97%</strong>；</li>
+        <li><strong>8月产销短线走弱</strong>：8月整车销量 <strong>3,746 辆 (-12.07%)</strong>，1-8月累计销量 26,771 辆 (-7.05%)；</li>
+        <li><strong>走弱定性</strong>：国内新能源公交渗透率超 99%，电动化替代完成导致换车周期由 8 年拉长至 10-12 年，国内呈现平稳存量期，增长全看海外。</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- 第三行：出海护城河、现金流体检与高分红 -->
+  <div class="bento-grid">
+    <!-- ③ 出海核心竞争力 4列卡片 -->
+    <div class="card col-4">
+      <div class="card-header">
+        <div class="card-title">
+          <span class="icon">🌍</span>
+          <span>③ 客车出海核心壁垒</span>
+        </div>
+        <span class="status-pill pill-accent">全球龙头</span>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div style="background:rgba(56,189,248,0.06);border:1px solid rgba(56,189,248,0.2);padding:12px;border-radius:var(--radius-sm);">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <strong style="font-size:13px;color:var(--accent);">大中型客车出口第一</strong>
+            <span style="font-size:11px;color:var(--accent);">市占率 22.08%</span>
+          </div>
+          <div style="font-size:12px;color:var(--text-muted);margin-top:4px;">
+            上半年7米以上大中客出口 6,642 辆，全行业唯一出口超 6,000 辆的企业，累计出口超 13.8 万辆。
+          </div>
+        </div>
+
+        <div style="background:rgba(168,85,247,0.06);border:1px solid rgba(168,85,247,0.2);padding:12px;border-radius:var(--radius-sm);">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <strong style="font-size:13px;color:#c084fc;">KD 本地化应对关税</strong>
+            <span style="font-size:11px;color:#c084fc;">十余国组装</span>
+          </div>
+          <div style="font-size:12px;color:var(--text-muted);margin-top:4px;">
+            在哈萨克斯坦、巴基斯坦、埃塞俄比亚、卡塔尔等国建立KD组装线，由“卖车”向“技术+品牌输出”升级。
+          </div>
+        </div>
+
+        <div style="background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.2);padding:12px;border-radius:var(--radius-sm);">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <strong style="font-size:13px;color:var(--down);">海外直销直服直融网络</strong>
+            <span style="font-size:11px;color:var(--down);">400+ 网点</span>
+          </div>
+          <div style="font-size:12px;color:var(--text-muted);margin-top:4px;">
+            海外授权 400+ 服务网点、自建 40 余个配件库，平均服务半径 120 公里，建立售后护城河。
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ④&⑤ 资产负债表与现金流 4列卡片 -->
+    <div class="card col-4">
+      <div class="card-header">
+        <div class="card-title">
+          <span class="icon">🏰</span>
+          <span>④&⑤ 极致稳健的“现金堡垒”</span>
+        </div>
+        <span class="status-pill pill-good">超级现金流</span>
+      </div>
+
+      <ul class="insight-list">
+        <li><strong>类现金远超有息负债</strong>：在手现金及理财达 <strong>60.95 亿元</strong>，而有息负债仅 <strong>2.10 亿元</strong>，类现金覆盖比高达 <strong>29 倍</strong>；</li>
+        <li><strong>无息商业负债为主</strong>：资产负债率 57.59%，绝大部分为应付账款和应付票据，对上下游占款议价能力极强；</li>
+        <li><strong>现金流暴增验证回款</strong>：
+          <div style="background:var(--surface);padding:8px 10px;border-radius:6px;margin-top:6px;font-size:12px;color:var(--text-muted);">
+            ① H1 经营现金流净额 <strong>59.49 亿元 (+247%)</strong>，超去年全年近两倍；<br>
+            ② 应收账款由 53.8 亿降至 30.15 亿，验证“此前现金流承压纯属时点错配”。
+          </div>
+        </li>
+      </ul>
+    </div>
+
+    <!-- ⑥ 股东回报与估值周期 4列卡片 -->
+    <div class="card col-4">
+      <div class="card-header">
+        <div class="card-title">
+          <span class="icon">🎁</span>
+          <span>⑥ 股东回报与周期定位</span>
+        </div>
+        <span class="status-pill pill-good">高股息防御</span>
+      </div>
+
+      <div style="margin-bottom:12px;">
+        <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text-dim);">
+          <span>2025 年度分红方案</span>
+          <span class="pos">10 派 20 元 (44.28 亿)</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text-dim);margin-top:4px;">
+          <span>2025 全年派息率</span>
+          <span class="pos">99.65% (极度慷慨)</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text-dim);margin-top:4px;">
+          <span>历史累计派现募资比</span>
+          <span class="accent">515% (A股第一梯队)</span>
+        </div>
+      </div>
+
+      <div style="background:#111827;padding:12px;border-radius:var(--radius-sm);border:1px solid var(--border);font-size:12px;line-height:1.6;">
+        <strong style="color:var(--accent);">周期与估值定性：</strong><br>
+        当前 PE(TTM) 仅 <strong>10.38 倍</strong>，股息率 <strong>7.77%</strong>。股价随国内产销数据疲软打至 52 周新低（24.66元），但卖方目标价高达 <strong>41.99 元 (+61.4%)</strong>。处于典型的<strong>“国内利空过度定价、海外高分红底色未改”的深价值底部区</strong>。
+      </div>
+    </div>
+  </div>
+
+  <!-- 第四行：BOLL (20, 2) 技术面量化推演 (12列大卡片) -->
+  <div class="bento-grid">
+    <div class="card col-12">
+      <div class="card-header">
+        <div class="card-title">
+          <span class="icon">📈</span>
+          <span>布林通道 (BOLL 20, 2) 技术形态与多空博弈沙盘</span>
+        </div>
+        <span class="status-pill pill-warn">贴近下轨·极端超卖</span>
+      </div>
+
+      <div style="display:grid;grid-template-columns: 1fr 1fr; gap: 20px;">
+        <!-- 左侧：通道区间与点位 -->
+        <div>
+          <div style="font-size:13px;color:var(--text-muted);margin-bottom:8px;">布林带三轨关键量化数据 (日线周期 · 2026-09-21)：</div>
+          <div class="boll-visual">
+            <div class="channel-line ch-upper">
+              <span>布林上轨 [Upper Band]</span>
+              <span>31.29 元 (强阻力顶区)</span>
+            </div>
+            <div class="channel-line ch-mid">
+              <span>布林中轨 [Middle Band · 20MA]</span>
+              <span>28.20 元 (多空强弱分水岭)</span>
+            </div>
+            <div class="channel-line ch-current">
+              <span>当前最新收盘价 [Close]</span>
+              <span>25.73 元 (下影线探底回抽)</span>
+            </div>
+            <div class="channel-line ch-lower">
+              <span>布林下轨 [Lower Band]</span>
+              <span>25.11 元 (今日盘中探穿24.66后拉回)</span>
+            </div>
+          </div>
+
+          <div style="margin-top:14px;font-size:12.5px;color:var(--text-muted);line-height:1.6;">
+            <p><strong>形态特征与买卖盘解析：</strong></p>
+            <p>9 月 1 日触及 30.54 元高点后一路单边缩量阴跌。9 月 21 日盘中放量砸出 <strong>24.66 元（创 52 周新低）</strong>，刺穿布林下轨（25.11 元）后获得强力资金承接，单日成交突破 <strong>10.7 亿元</strong>，收出长下影线回拉至 25.73 元，呈现典型的<strong>“穿轨恐慌盘出清、下轨探底抵抗”</strong>形态。</p>
+          </div>
+        </div>
+
+        <!-- 右侧：BOLL 通道示意图与动能指标 -->
+        <div>
+          <div style="font-size:13px;color:var(--text-muted);margin-bottom:8px;">布林通道探底回升走势模拟：</div>
+          <div class="chart-canvas-wrap" style="height:140px;background:#111827;border-radius:var(--radius-sm);border:1px solid var(--border);padding:6px;">
+            <canvas id="yutongBollCanvas"></canvas>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;">
+            <div style="background:var(--surface);padding:8px 12px;border-radius:6px;font-size:12px;">
+              <span style="color:var(--text-dim);">MACD(12,26,9)</span><br>
+              <span style="color:#fda4af;">DIF: -1.091</span> / <span style="color:#93c5fd;">DEA: -0.878</span><br>
+              <span class="warn">死叉深水区运行 (钝化待拐点)</span>
+            </div>
+            <div style="background:var(--surface);padding:8px 12px;border-radius:6px;font-size:12px;">
+              <span style="color:var(--text-dim);">KDJ(9,3,3) & RSI(6)</span><br>
+              <span>K: 18.4 / D: 14.0 / J: 27.1</span><br>
+              <span class="pos">RSI6=14.75 极端超卖反抽区间</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 第五行：诊断结论与跟踪清单 (8列+4列) -->
+  <div class="bento-grid">
+    <div class="card col-8">
+      <div class="card-header">
+        <div class="card-title">
+          <span class="icon">🎯</span>
+          <span>综合诊断结论与操作策略参考</span>
+        </div>
+        <span class="status-pill pill-accent">多维定性推演</span>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+        <div style="background:rgba(244,63,94,0.06);border:1px solid rgba(244,63,94,0.2);padding:12px;border-radius:var(--radius-sm);">
+          <strong style="color:var(--up);font-size:13px;">⚠️ 短期承压与风险项</strong>
+          <ul class="insight-list" style="margin-top:6px;font-size:12px;">
+            <li><strong>国内需求降速</strong>：公交电动化饱和，置换周期拉长导致8月销量 -12.1%；</li>
+            <li><strong>外销汇兑与政策</strong>：海外收入占比过半，汇率波动带来财务费用扰动；</li>
+            <li><strong>机构减仓压制</strong>：二季度公募持股家数明显减少，技术面均线呈空头排列。</li>
+          </ul>
+        </div>
+
+        <div style="background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.2);padding:12px;border-radius:var(--radius-sm);">
+          <strong style="color:var(--down);font-size:13px;">💡 核心看点与深价值底色</strong>
+          <ul class="insight-list" style="margin-top:6px;font-size:12px;">
+            <li><strong>主业扣非高增</strong>：Q2 扣非 +30.9%，毛利率 24.47% 大幅抬升；</li>
+            <li><strong>全球出海第一</strong>：中大客出口市占率 22%，新能源出口暴增 54.1%；</li>
+            <li><strong>极限安全垫</strong>：类现金是负债 29 倍，近 100% 派息率对应 7.77% 股息。</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="card col-4">
+      <div class="card-header">
+        <div class="card-title">
+          <span class="icon">📌</span>
+          <span>后续核心跟踪清单</span>
+        </div>
+      </div>
+
+      <ul class="insight-list" style="font-size:12.5px;">
+        <li><strong>9-10月出海订单与交付</strong>：欧洲及拉美客车出海是否延续量价双升；</li>
+        <li><strong>国内以旧换新节奏</strong>：各省公交报废更新补贴落地带来的增量弹性；</li>
+        <li><strong>24.66~25.10 元防守确认</strong>：今日探底长下影线若能企稳，则构筑双底或超跌强反抽通道。</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- 页脚与免责声明 -->
+  <footer>
+    <div class="disclaimer-badge">合规免责声明</div>
+    <p>1. 本报告仅供学术研究与定量分析参考，不构成针对任何具体投资者的证券投资咨询、买卖建议或承诺保本保收益。证券市场存在波动风险，投资需谨慎。</p>
+    <p>2. 报告中引用的财务数据来自宇通客车（600066.SH）披露之法定报告与公开产销快报；行情指标与布林通道参数基于历史公开交易数据推导，过往表现不代表未来走势。</p>
+    <p style="margin-top:6px;color:var(--text-dim);">Generated with Baoyu Infographic Bento-Grid Principles · StockReport v2 · 2026-09-21</p>
+  </footer>
+</div>
+
+<script>
+  // 原生 Canvas 绘制图1：分季度扣非利润与毛利率走势
+  (function initBusinessTrendChart() {
+    const canvas = document.getElementById('businessTrendChart');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const dpr = window.devicePixelRatio || 1;
+
+    function render() {
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      ctx.scale(dpr, dpr);
+
+      const w = rect.width;
+      const h = rect.height;
+      ctx.clearRect(0, 0, w, h);
+
+      const quarters = ["2025Q2", "2025Q3", "2025Q4", "2026Q1", "2026Q2"];
+      const deductProfits = [9.08, 10.66, 19.64, 6.07, 11.88]; // 扣非净利(亿)
+      const grossMargins = [22.94, 23.98, 27.26, 23.56, 24.97]; // 毛利率(%)
+
+      const paddingLeft = 50;
+      const paddingRight = 50;
+      const paddingTop = 20;
+      const paddingBottom = 25;
+      const plotW = w - paddingLeft - paddingRight;
+      const plotH = h - paddingTop - paddingBottom;
+
+      const barWidth = 28;
+      const maxProfit = 22;
+
+      // 绘制柱状图 (扣非净利)
+      quarters.forEach((q, i) => {
+        const x = paddingLeft + (i + 0.5) * (plotW / quarters.length);
+        const barH = (deductProfits[i] / maxProfit) * plotH;
+        const y = h - paddingBottom - barH;
+
+        ctx.fillStyle = i === 4 ? "#f43f5e" : "#38bdf8";
+        ctx.beginPath();
+        ctx.roundRect(x - barWidth / 2, y, barWidth, barH, [4, 4, 0, 0]);
+        ctx.fill();
+
+        // 柱顶标签
+        ctx.fillStyle = "#f8fafc";
+        ctx.font = "11px sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText(deductProfits[i] + "亿", x, y - 5);
+
+        // X 轴标签
+        ctx.fillStyle = "#94a3b8";
+        ctx.fillText(q, x, h - 8);
+      });
+
+      // 绘制折线图 (毛利率)
+      ctx.strokeStyle = "#a855f7";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      quarters.forEach((q, i) => {
+        const x = paddingLeft + (i + 0.5) * (plotW / quarters.length);
+        // 毛利率范围 20%~30%
+        const normY = (grossMargins[i] - 20) / 10;
+        const y = h - paddingBottom - normY * plotH;
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      });
+      ctx.stroke();
+
+      // 折线点与标签
+      quarters.forEach((q, i) => {
+        const x = paddingLeft + (i + 0.5) * (plotW / quarters.length);
+        const normY = (grossMargins[i] - 20) / 10;
+        const y = h - paddingBottom - normY * plotH;
+
+        ctx.fillStyle = "#a855f7";
+        ctx.beginPath();
+        ctx.arc(x, y, 3.5, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = "#c084fc";
+        ctx.font = "10px sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText(grossMargins[i] + "%", x, y - 8);
+      });
+    }
+
+    render();
+    window.addEventListener('resize', render);
+  })();
+
+  // 原生 Canvas 绘制图2：宇通 BOLL 通道示意图
+  (function initYutongBollChart() {
+    const canvas = document.getElementById('yutongBollCanvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const dpr = window.devicePixelRatio || 1;
+
+    function render() {
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      ctx.scale(dpr, dpr);
+
+      const w = rect.width;
+      const h = rect.height;
+      ctx.clearRect(0, 0, w, h);
+
+      // 上轨 (31.29)、中轨 (28.20)、下轨 (25.11)、现价 (25.73)、盘中低 (24.66)
+      const topY = 18;
+      const midY = 65;
+      const botY = 115;
+      const currY = 104; // 25.73 在 25.11 上方
+      const lowY = 126;  // 24.66 刺穿下轨
+
+      // 背景通道色
+      ctx.fillStyle = "rgba(56, 189, 248, 0.04)";
+      ctx.beginPath();
+      ctx.moveTo(10, topY);
+      ctx.bezierCurveTo(w * 0.3, topY + 4, w * 0.7, topY + 8, w - 10, topY + 12);
+      ctx.lineTo(w - 10, botY);
+      ctx.bezierCurveTo(w * 0.7, botY - 4, w * 0.3, botY - 2, 10, botY);
+      ctx.closePath();
+      ctx.fill();
+
+      // 上轨线
+      ctx.strokeStyle = "#f43f5e";
+      ctx.lineWidth = 1.5;
+      ctx.setLineDash([4, 4]);
+      ctx.beginPath();
+      ctx.moveTo(10, topY);
+      ctx.bezierCurveTo(w * 0.3, topY + 4, w * 0.7, topY + 8, w - 10, topY + 12);
+      ctx.stroke();
+
+      // 下轨线
+      ctx.strokeStyle = "#10b981";
+      ctx.beginPath();
+      ctx.moveTo(10, botY);
+      ctx.bezierCurveTo(w * 0.7, botY - 4, w * 0.3, botY - 2, 10, botY);
+      ctx.stroke();
+
+      // 中轨线
+      ctx.strokeStyle = "#38bdf8";
+      ctx.setLineDash([]);
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(10, midY);
+      ctx.bezierCurveTo(w * 0.3, midY + 4, w * 0.7, midY + 8, w - 10, midY + 12);
+      ctx.stroke();
+
+      // 探底长下影线 K 线
+      const kX = w * 0.82;
+      ctx.strokeStyle = "#f59e0b";
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(kX, currY - 6);
+      ctx.lineTo(kX, lowY); // 下影线刺穿至 24.66
+      ctx.stroke();
+
+      // 实体
+      ctx.fillStyle = "#f59e0b";
+      ctx.fillRect(kX - 4, currY - 6, 8, 8);
+
+      // 标签
+      ctx.font = "11px sans-serif";
+      ctx.fillStyle = "#f59e0b";
+      ctx.textAlign = "right";
+      ctx.fillText("现价 25.73 (长下影抗跌)", kX - 10, currY - 2);
+
+      ctx.fillStyle = "#fda4af";
+      ctx.font = "10px sans-serif";
+      ctx.fillText("盘中低 24.66 (刺穿下轨)", kX - 10, lowY + 4);
+    }
+
+    render();
+    window.addEventListener('resize', render);
+  })();
+</script>
+</body>
+</html>
