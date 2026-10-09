@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>深证综指小微盘财务量化选股报告 (2026-10-09)</title>
+<style>
+  :root {
+    --bg-primary: #f8fafc;
+    --bg-card: #ffffff;
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+    --border-color: #e2e8f0;
+    --accent-red: #dc2626; /* 涨/重点 A股惯例 */
+    --accent-green: #16a34a; /* 跌 */
+    --accent-blue: #2563eb;
+    --accent-slate: #f1f5f9;
+  }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    line-height: 1.6;
+    margin: 0;
+    padding: 24px;
+  }
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  .header {
+    background: var(--bg-card);
+    padding: 28px;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    margin-bottom: 24px;
+  }
+  .header h1 {
+    margin: 0 0 12px 0;
+    font-size: 26px;
+    color: var(--text-primary);
+  }
+  .meta-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    font-size: 13px;
+    color: var(--text-secondary);
+  }
+  .badge {
+    background: var(--accent-slate);
+    padding: 4px 10px;
+    border-radius: 6px;
+    border: 1px solid #cbd5e1;
+  }
+  .badge.highlight {
+    background: #eff6ff;
+    color: var(--accent-blue);
+    border-color: #bfdbfe;
+    font-weight: 600;
+  }
+  .card {
+    background: var(--bg-card);
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    padding: 24px;
+    margin-bottom: 24px;
+  }
+  .card-title {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-left: 4px solid var(--accent-blue);
+    padding-left: 10px;
+  }
+  .logic-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+  .logic-item {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    padding: 14px;
+    border-radius: 8px;
+  }
+  .logic-item h4 {
+    margin: 0 0 6px 0;
+    font-size: 14px;
+    color: var(--accent-blue);
+  }
+  .logic-item p {
+    margin: 0;
+    font-size: 13px;
+    color: var(--text-secondary);
+  }
+  .table-container {
+    overflow-x: auto;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13.5px;
+    text-align: left;
+  }
+  th {
+    background: #f8fafc;
+    color: #334155;
+    font-weight: 600;
+    padding: 12px 14px;
+    border-bottom: 2px solid var(--border-color);
+    white-space: nowrap;
+  }
+  td {
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--border-color);
+    white-space: nowrap;
+  }
+  tr:hover {
+    background-color: #f1f5f9;
+  }
+  .up {
+    color: var(--accent-red);
+    font-weight: 600;
+  }
+  .down {
+    color: var(--accent-green);
+    font-weight: 600;
+  }
+  .flat {
+    color: var(--text-secondary);
+    font-weight: 600;
+  }
+  .tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    background: #e2e8f0;
+    color: #334155;
+  }
+  .disclaimer {
+    background: #fffbeb;
+    border: 1px solid #fef3c7;
+    border-left: 4px solid #f59e0b;
+    padding: 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    color: #92400e;
+    line-height: 1.6;
+    margin-top: 24px;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1>深证综指小微盘财务量化选股报告</h1>
+    <div class="meta-badges">
+      <span class="badge highlight">基准指数：深证综指 (399101.XSHE)</span>
+      <span class="badge">运行截面：2026-10-09</span>
+      <span class="badge">选股范围：10亿 - 50亿</span>
+      <span class="badge">数量目标：Top 10 行业分散标的</span>
+      <span class="badge">数据来源：WeStock 金融高频量化终端</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">策略执行逻辑拆解</div>
+    <div class="logic-grid">
+      <div class="logic-item">
+        <h4>1. 初始股票池范围</h4>
+        <p>深证综指（399101）全成份股作为底池，严格过滤ST、*ST、退市整理期股票及停牌标的。</p>
+      </div>
+      <div class="logic-item">
+        <h4>2. 新国九条财务硬约束</h4>
+        <p>近一年归母净利润 &gt; 0 且营业收入 &gt; 1 亿元（剔除主业空壳与资不抵债风险企业）。</p>
+      </div>
+      <div class="logic-item">
+        <h4>3. 市值升序与行业分散</h4>
+        <p>在 [10亿, 50亿] 微盘区间按总市值升序排列，逐一匹配申万一级行业，同行业只取市值最小前 1 只。</p>
+      </div>
+      <div class="logic-item">
+        <h4>4. 价格上限与停板过滤</h4>
+        <p>剔除当日涨停封单票与高价股，最终精选出 10 只满足微盘弹性与主业健康度的标的。</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">筛选产出最终股票池 (TOP 10 行业分散)</div>
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>序号</th>
+            <th>股票代码</th>
+            <th>股票名称</th>
+            <th>申万一级行业</th>
+            <th>总市值 (亿元)</th>
+            <th>最新现价 (¥)</th>
+            <th>当日涨跌幅</th>
+            <th>营业收入TTM (亿元)</th>
+            <th>归母净利润TTM (万元)</th>
+            <th>市盈率 PE(TTM)</th>
+            <th>市净率 PB</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td><strong>sz002494</strong></td>
+            <td>华斯股份</td>
+            <td><span class="tag">纺织服饰</span></td>
+            <td>18.41</td>
+            <td>4.88</td>
+            <td class="down">-1.61%</td>
+            <td>4.96</td>
+            <td>2,262.57</td>
+            <td>81.38</td>
+            <td>1.48</td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td><strong>sz002629</strong></td>
+            <td>仁智股份</td>
+            <td><span class="tag">石油石化</span></td>
+            <td>18.83</td>
+            <td>4.42</td>
+            <td class="down">-1.12%</td>
+            <td>3.12</td>
+            <td>911.47</td>
+            <td>206.63</td>
+            <td>34.22</td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td><strong>sz002760</strong></td>
+            <td>凤形股份</td>
+            <td><span class="tag">机械设备</span></td>
+            <td>19.02</td>
+            <td>17.61</td>
+            <td class="down">-3.51%</td>
+            <td>6.71</td>
+            <td>2,067.34</td>
+            <td>91.99</td>
+            <td>2.27</td>
+          </tr>
+          <tr>
+            <td>4</td>
+            <td><strong>sz002316</strong></td>
+            <td>亚联发展</td>
+            <td><span class="tag">综合</span></td>
+            <td>19.07</td>
+            <td>4.85</td>
+            <td class="down">-2.61%</td>
+            <td>5.32</td>
+            <td>43.33</td>
+            <td>4400.21</td>
+            <td>24.66</td>
+          </tr>
+          <tr>
+            <td>5</td>
+            <td><strong>sz002188</strong></td>
+            <td>中天服务</td>
+            <td><span class="tag">房地产</span></td>
+            <td>19.17</td>
+            <td>5.86</td>
+            <td class="down">-1.84%</td>
+            <td>4.15</td>
+            <td>2,806.27</td>
+            <td>68.31</td>
+            <td>5.20</td>
+          </tr>
+          <tr>
+            <td>6</td>
+            <td><strong>sz002778</strong></td>
+            <td>中晟高科</td>
+            <td><span class="tag">环保</span></td>
+            <td>19.29</td>
+            <td>15.46</td>
+            <td class="down">-2.71%</td>
+            <td>2.28</td>
+            <td>1,620.90</td>
+            <td>118.99</td>
+            <td>6.10</td>
+          </tr>
+          <tr>
+            <td>7</td>
+            <td><strong>sz003003</strong></td>
+            <td>天元股份</td>
+            <td><span class="tag">轻工制造</span></td>
+            <td>19.47</td>
+            <td>11.02</td>
+            <td class="down">-2.13%</td>
+            <td>9.97</td>
+            <td>5,618.07</td>
+            <td>34.66</td>
+            <td>1.50</td>
+          </tr>
+          <tr>
+            <td>8</td>
+            <td><strong>sz002817</strong></td>
+            <td>黄山胶囊</td>
+            <td><span class="tag">医药生物</span></td>
+            <td>20.22</td>
+            <td>6.76</td>
+            <td class="down">-0.88%</td>
+            <td>4.07</td>
+            <td>5,957.12</td>
+            <td>33.94</td>
+            <td>2.08</td>
+          </tr>
+          <tr>
+            <td>9</td>
+            <td><strong>sz003008</strong></td>
+            <td>开普检测</td>
+            <td><span class="tag">社会服务</span></td>
+            <td>20.31</td>
+            <td>19.53</td>
+            <td class="down">-1.16%</td>
+            <td>2.18</td>
+            <td>8,012.62</td>
+            <td>25.35</td>
+            <td>2.01</td>
+          </tr>
+          <tr>
+            <td>10</td>
+            <td><strong>sz002247</strong></td>
+            <td>聚力文化</td>
+            <td><span class="tag">建筑材料</span></td>
+            <td>20.93</td>
+            <td>2.46</td>
+            <td class="flat">0.00%</td>
+            <td>7.96</td>
+            <td>4,002.03</td>
+            <td>52.30</td>
+            <td>3.05</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">微盘策略风险与实盘操作建议</div>
+    <ul style="color: var(--text-secondary); font-size: 14px; line-height: 1.8; padding-left: 20px;">
+      <li><strong>流动性与换手监测：</strong> 小微盘股票由于流通市值普遍在 15-20 亿左右，受单一大单买卖冲击影响较大，建仓时应分散下单，避免市价大额冲击。</li>
+      <li><strong>行业高度分散：</strong> 策略通过行业去重逻辑，将持仓横跨纺织服饰、机械设备、医药、环保、轻工、建材等 10 个独立领域，有效平抑单一行业政策风险。</li>
+      <li><strong>基本面稳健底线：</strong> 10 只入选标的营收均超过 2 亿元（最高达 9.97 亿元），净利润全部为正，避开了无营收支撑的纯壳资源，符合退市新规要求。</li>
+    </ul>
+  </div>
+
+  <div class="disclaimer">
+    <strong>免责声明：</strong>以上内容基于公开数据和量化分析，仅供参考，不构成投资建议。市场有风险，投资需谨慎。任何投资决策应结合个人风险承受能力、资金状况和投资目标独立判断，必要时咨询持牌专业机构。过往表现不预示未来收益。
+  </div>
+</div>
+</body>
+</html>
