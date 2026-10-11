@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>润贝航科 (001316.SZ) · 六维基本面分析报告</title>
+<style>
+  :root {
+    --bg: #0b1120;
+    --surface: #151f32;
+    --surface-card: #182338;
+    --surface-hover: #22314d;
+    --border: #2b3952;
+    --border-light: rgba(255, 255, 255, 0.08);
+    --text-main: #f8fafc;
+    --text-muted: #94a3b8;
+    --text-dim: #64748b;
+    --up: #f43f5e;
+    --up-bg: rgba(244, 63, 94, 0.12);
+    --up-border: rgba(244, 63, 94, 0.35);
+    --down: #10b981;
+    --down-bg: rgba(16, 185, 129, 0.12);
+    --down-border: rgba(16, 185, 129, 0.35);
+    --warn: #f59e0b;
+    --warn-bg: rgba(245, 158, 11, 0.12);
+    --warn-border: rgba(245, 158, 11, 0.35);
+    --accent: #38bdf8;
+    --purple: #a855f7;
+    --radius-sm: 8px;
+    --radius-md: 14px;
+    --radius-lg: 20px;
+    --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.45), 0 8px 10px -6px rgba(0, 0, 0, 0.35);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background-color: var(--bg);
+    color: var(--text-main);
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+    line-height: 1.6;
+    padding: 32px 16px;
+    background-image:
+      radial-gradient(at 0% 0%, rgba(56, 189, 248, 0.08) 0px, transparent 50%),
+      radial-gradient(at 100% 100%, rgba(168, 85, 247, 0.06) 0px, transparent 50%);
+    min-height: 100vh;
+  }
+  .container { max-width: 1240px; margin: 0 auto; }
+  header {
+    margin-bottom: 28px; padding-bottom: 20px; border-bottom: 1px solid var(--border);
+    display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px;
+  }
+  .title-group h1 { font-size: 28px; font-weight: 800; letter-spacing: -0.5px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .stock-code {
+    font-size: 14px; font-weight: 600; color: var(--accent); background: rgba(56, 189, 248, 0.12);
+    border: 1px solid rgba(56, 189, 248, 0.3); padding: 3px 10px; border-radius: 999px;
+  }
+  .subtitle { color: var(--text-muted); font-size: 14px; margin-top: 6px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .badges-group { display: flex; gap: 8px; flex-wrap: wrap; }
+  .badge { font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 6px; border: 1px solid var(--border); background: var(--surface); color: var(--text-muted); }
+  .badge.verified { background: linear-gradient(135deg, rgba(56, 189, 248, 0.15), rgba(16, 185, 129, 0.15)); border-color: rgba(56, 189, 248, 0.4); color: #e2e8f0; }
+
+  .bento-grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 18px; margin-bottom: 24px; }
+  .col-12 { grid-column: span 12; }
+  .col-8 { grid-column: span 8; }
+  .col-7 { grid-column: span 7; }
+  .col-6 { grid-column: span 6; }
+  .col-5 { grid-column: span 5; }
+  .col-4 { grid-column: span 4; }
+  .col-3 { grid-column: span 3; }
+  @media (max-width: 1024px) { .col-8, .col-7, .col-5, .col-4, .col-3 { grid-column: span 6; } }
+  @media (max-width: 720px) { .col-8, .col-7, .col-6, .col-5, .col-4, .col-3 { grid-column: span 12; } }
+
+  .card {
+    background: var(--surface-card); border: 1px solid var(--border-light); border-radius: var(--radius-md);
+    padding: 20px; position: relative; overflow: hidden; box-shadow: var(--shadow); transition: border-color 0.2s ease;
+  }
+  .card:hover { border-color: rgba(255, 255, 255, 0.18); }
+  .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; gap: 10px; flex-wrap: wrap; }
+  .card-title { font-size: 15px; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 8px; }
+  .status-pill { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 999px; white-space: nowrap; }
+  .pill-warn { background: var(--warn-bg); color: var(--warn); border: 1px solid var(--warn-border); }
+  .pill-danger { background: var(--up-bg); color: var(--up); border: 1px solid var(--up-border); }
+  .pill-good { background: var(--down-bg); color: var(--down); border: 1px solid var(--down-border); }
+  .pill-accent { background: rgba(56,189,248,0.12); color: var(--accent); border: 1px solid rgba(56,189,248,0.3); }
+  .pill-purple { background: rgba(168,85,247,0.12); color: var(--purple); border: 1px solid rgba(168,85,247,0.3); }
+
+  .kpi-card { display: flex; flex-direction: column; justify-content: space-between; padding: 18px; }
+  .kpi-label { font-size: 12px; color: var(--text-muted); font-weight: 500; }
+  .kpi-num { font-size: 26px; font-weight: 800; margin: 6px 0; font-feature-settings: "tnum"; letter-spacing: -0.5px; }
+  .kpi-sub { font-size: 12px; color: var(--text-dim); display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+
+  .pos { color: var(--up); }
+  .neg { color: var(--down); }
+  .warn { color: var(--warn); }
+  .accent { color: var(--accent); }
+
+  .progress-bar-bg { background: var(--surface); height: 6px; border-radius: 999px; overflow: hidden; margin: 8px 0; position: relative; }
+  .progress-fill { height: 100%; border-radius: 999px; }
+
+  .bento-table { width: 100%; border-collapse: collapse; font-size: 12.5px; margin-top: 10px; }
+  .bento-table th { text-align: left; color: var(--text-dim); padding: 8px 10px; border-bottom: 1px solid var(--border); font-weight: 600; }
+  .bento-table td { padding: 10px; border-bottom: 1px solid rgba(255, 255, 255, 0.04); color: var(--text-main); }
+  .bento-table tr:last-child td { border-bottom: none; }
+
+  .insight-list { list-style: none; font-size: 13px; color: var(--text-muted); }
+  .insight-list li { position: relative; padding-left: 18px; margin-bottom: 10px; line-height: 1.55; }
+  .insight-list li::before { content: "\2022"; position: absolute; left: 0; top: 0; color: var(--accent); font-size: 16px; }
+  .insight-list li strong { color: var(--text-main); }
+
+  .audit-notice {
+    background: rgba(56, 189, 248, 0.08); border: 1px solid rgba(56, 189, 248, 0.25);
+    border-radius: var(--radius-sm); padding: 12px 16px; font-size: 12px; color: #bae6fd; margin-bottom: 20px; line-height: 1.7;
+  }
+  .chart-wrap { margin-top: 12px; }
+  .chart-cap { font-size: 11px; color: var(--text-dim); text-align: right; margin-top: 4px; }
+  .note-box { background: var(--surface); padding: 10px 12px; border-radius: var(--radius-sm); font-size: 12px; color: var(--text-muted); margin-top: 10px; line-height: 1.6; }
+  footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--border); color: var(--text-dim); font-size: 12px; line-height: 1.8; }
+  .disclaimer-badge {
+    display: inline-block; color: var(--warn); border: 1px solid var(--warn-border); background: var(--warn-bg);
+    padding: 2px 8px; border-radius: 4px; font-weight: bold; margin-bottom: 8px;
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <div class="title-group">
+      <h1>润贝航科 <span class="stock-code">001316.SZ</span> 六维基本面分析</h1>
+      <div class="subtitle">
+        <span>数据基准：2026 年半年报（未经审计，2026-08-23 披露）+ 2026-10-09 收盘确认行情 + 9-10 月公开公告</span>
+        <span>&bull;</span>
+        <span>2026H1 营收 5.73 亿 (+21.97%) / 归母 1.12 亿 (+44.82%)</span>
+        <span>&bull;</span>
+        <span>总市值 43.14 亿元</span>
+      </div>
+    </div>
+    <div class="badges-group">
+      <span class="badge verified">口径核验版</span>
+      <span class="badge">六维基本面模型</span>
+      <span class="badge">分销 + 自研双轮拆解</span>
+      <span class="badge">分红与筹码解构</span>
+    </div>
+  </header>
+
+  <div class="audit-notice">
+    <strong>数据与口径核验说明（产出前自检）：</strong><br>
+    1. <strong>负债分母分层，不偷换</strong>：类现金 8.30 亿元对应的是<strong>有息负债 0.59 亿元</strong>的 14.0 倍；对<strong>全部流动负债 2.32 亿元</strong>覆盖率 3.58 倍，对<strong>总负债 2.36 亿元</strong>覆盖率 3.52 倍。不得简写为“现金是负债的 14 倍”，也不宜称“极限安全垫”。<br>
+    2. <strong>目标价现算</strong>：机构一致预期目标价 39.64 元、华泰证券 40.10 元（2026-07-20，买入），按 2026-10-09 收盘价 26.77 元现算空间为 <strong>+48.08% / +49.79%</strong>；该等目标价系机构在自身情景假设下的判断，不构成低估证明。<br>
+    3. <strong>行情时效统一</strong>：本报告全部价格与估值指标为 <strong>2026-10-09 收盘确认值</strong>（26.77 元，全日成交 0.97 亿元，换手 2.48%）；10 月 10-11 日为周末休市。<br>
+    4. <strong>分部口径勾稽</strong>：分部收入、分部毛利率、内外销占比均为 <strong>2026H1 同一报告期、同一范围</strong>口径；2025 全年分部数据单独标注，未跨期混用。<br>
+    5. <strong>分红双口径</strong>：区分“会计年度派息率”与“近 12 个月已除权 TTM 股息率”；公司 2026 中期<strong>已实施</strong>分红（10 派 3.5 元，9 月 4 日除权），非“未分配”。
+  </div>
+
+  <div class="bento-grid">
+    <div class="card kpi-card col-3">
+      <div>
+        <div class="kpi-label">收盘价 &middot; PE / PB（2026-10-09）</div>
+        <div class="kpi-num accent">26.77 <span style="font-size:14px;font-weight:normal;color:var(--text-dim);">元</span></div>
+      </div>
+      <div class="kpi-sub"><span>PE(TTM): 19.75x</span><span>PB: 3.32x</span></div>
+      <div style="margin-top:10px;">
+        <div style="font-size:11px;color:var(--text-dim);display:flex;justify-content:space-between;">
+          <span>52周低 21.35</span><span class="warn">区间 23.1% 分位</span><span>52周高 44.79</span>
+        </div>
+        <div class="progress-bar-bg"><div class="progress-fill" style="width: 23.1%; background: var(--warn);"></div></div>
+        <div style="font-size:11px;color:var(--text-dim);">前复权口径（含 2026 年 5 月 10 转 4 除权）</div>
+      </div>
+    </div>
+
+    <div class="card kpi-card col-3">
+      <div>
+        <div class="kpi-label">2026 H1 归母 / 扣非归母</div>
+        <div class="kpi-num pos">1.12 <span style="font-size:14px;font-weight:normal;color:var(--text-dim);">亿元</span></div>
+      </div>
+      <div class="kpi-sub"><span>归母: <b class="pos">+44.82%</b></span><span>扣非: 1.10 亿 (+45.14%)</span></div>
+      <div style="margin-top:10px;">
+        <div style="font-size:11px;color:var(--text-dim);display:flex;justify-content:space-between;">
+          <span>Q1 单季扣非 0.612 亿 (+86.1%)</span><span class="warn">Q2 单季 +13.5%（环比 -21.1%）</span>
+        </div>
+        <div class="progress-bar-bg"><div class="progress-fill" style="width: 45%; background: var(--warn);"></div></div>
+        <div style="font-size:11px;color:var(--text-dim);">增速自 Q1 高位显著回落，为本次分析核心疑点</div>
+      </div>
+    </div>
+
+    <div class="card kpi-card col-3">
+      <div>
+        <div class="kpi-label">类现金 vs 负债分层结构</div>
+        <div class="kpi-num accent">8.30 <span style="font-size:14px;font-weight:normal;color:var(--text-dim);">亿元</span></div>
+      </div>
+      <div class="kpi-sub"><span>有息负债 0.59 亿 (14.0x)</span><span>资产负债率 14.78%</span></div>
+      <div style="margin-top:10px;">
+        <div style="font-size:11px;color:var(--text-dim);display:flex;justify-content:space-between;">
+          <span>流动负债覆盖率 3.58x</span><span>总负债覆盖率 3.52x</span>
+        </div>
+        <div class="progress-bar-bg"><div class="progress-fill" style="width: 76%; background: var(--accent);"></div></div>
+        <div style="font-size:11px;color:var(--text-dim);">货币资金 1.59 亿 + 交易性金融资产 6.71 亿</div>
+      </div>
+    </div>
+
+    <div class="card kpi-card col-3">
+      <div>
+        <div class="kpi-label">近 12 个月已除权分红（TTM）</div>
+        <div class="kpi-num">2.47%</div>
+      </div>
+      <div class="kpi-sub"><span>派现合计 1.066 亿元</span><span>2025 年度派息率 49.1%</span></div>
+      <div style="margin-top:10px;">
+        <div style="font-size:11px;color:var(--text-dim);display:flex;justify-content:space-between;">
+          <span>2026 中期已派 0.564 亿（派息率 50.4%）</span><span class="accent">无有息压力</span>
+        </div>
+        <div class="progress-bar-bg"><div class="progress-fill" style="width: 50.4%; background: var(--purple);"></div></div>
+        <div style="font-size:11px;color:var(--text-dim);">近三年累计分红率 47.5%（1.73 亿元）</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="bento-grid">
+    <div class="card col-8">
+      <div class="card-header">
+        <div class="card-title"><span>&#128269;</span><span>&#9312; 剔除噪音还原主业：利润表“干净”，但增速含三块非经营助推</span></div>
+        <span class="status-pill pill-good">归母与扣非差异仅 2.1%</span>
+      </div>
+      <p style="font-size:13px;color:var(--text-muted);margin-bottom:6px;">
+        2026 上半年归母净利润 1.1187 亿元，扣非归母 1.0956 亿元，两者差额仅 231 万元（占归母 <strong>2.1%</strong>）；
+        2025 全年差额 313 万元（1.7%）、2024 全年 366 万元（4.1%）。<strong>利润表没有一次性收益粉饰，是“苏泊尔式干净报表”而非“分众式噪音报表”</strong>——利润下滑即真下滑，利润增长也基本是真经营增长。
+      </p>
+      <table class="bento-table">
+        <thead>
+          <tr><th>报告期</th><th>归母净利</th><th>扣非归母</th><th>剪刀差</th><th>拆解与判读</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>2024 全年</td><td>0.885 亿</td><td>0.849 亿</td><td class="neg">366 万 / 4.1%</td><td>干净；当年归母同比 -4.2%，下滑真实</td></tr>
+          <tr><td>2025 全年</td><td class="pos">1.839 亿 (+107.7%)</td><td class="pos">1.807 亿</td><td class="neg">313 万 / 1.7%</td><td>干净；高增归因：收入上升 + <strong>股份支付费用同比下降</strong> + 汇兑损益（公司自述）</td></tr>
+          <tr><td>2026 H1</td><td class="pos">1.119 亿 (+44.8%)</td><td class="pos">1.096 亿 (+45.1%)</td><td class="neg">231 万 / 2.1%</td><td>干净；扣非增速略高于归母，主业支撑更稳固</td></tr>
+        </tbody>
+      </table>
+
+      <div class="note-box">
+        <strong style="color:var(--text-main);">但“干净”不等于“增速全由主业驱动”，三块半经营性助推需单独算账：</strong><br>
+        <strong>(1) 净利息/理财收入：</strong>2026H1 财务费用为 <strong>-926 万元</strong>（净收益，其中利息收入 837 万元），来自 8.3 亿元类现金与 6.71 亿元理财——这是资产结构在贡献利润，剔除后营业利润率下降约 1.6pct。<br>
+        <strong>(2) 股份支付费用自然衰减：</strong>销售费用同比 -10.78%、研发费用同比 -6.83%，公司均归因于“股份支付费用减少”；2023 年限制性股票激励计划已进入第三个解除限售期（2026-09-24 公告条件成就）。<br>
+        <strong>(3) 汇兑损益：</strong>分销业务以美元进口采购，汇率对毛利与财务费用双向扰动，2025 年利润翻倍与之一部分相关。<br>
+        <strong>结论：</strong>表观 +44.8% 的利润增速中，真实经营改善（收入 + 结构 + 经营杠杆）为主，但上述三项对增速有可观边际贡献；不宜把 45% 直接当作可外推的经营斜率。
+      </div>
+    </div>
+
+    <div class="card col-4">
+      <div class="card-header">
+        <div class="card-title"><span>&#8986;</span><span>&#9313; 分季度趋势：增速高位回落</span></div>
+        <span class="status-pill pill-warn">Q2 环比双降</span>
+      </div>
+      <table class="bento-table">
+        <thead><tr><th>单季</th><th>营收</th><th>同比</th><th>扣非</th><th>同比</th></tr></thead>
+        <tbody>
+          <tr><td>2025Q1</td><td>2.38 亿</td><td class="pos">+21.3%</td><td>0.329 亿</td><td class="pos">+65.2%</td></tr>
+          <tr><td>2025Q2</td><td>2.32 亿</td><td class="pos">+3.1%</td><td>0.426 亿</td><td class="pos">+80.8%</td></tr>
+          <tr><td>2025Q3</td><td>2.83 亿</td><td class="pos">+14.4%</td><td>0.370 亿</td><td class="pos">+27.6%</td></tr>
+          <tr style="background:rgba(244,63,94,0.06);"><td><strong>2025Q4</strong></td><td><strong>4.64 亿</strong></td><td class="pos"><strong>+92.4%</strong></td><td><strong>0.682 亿</strong></td><td class="pos"><strong>+451.9%</strong></td></tr>
+          <tr><td>2026Q1</td><td>2.98 亿</td><td class="pos">+25.2%</td><td>0.612 亿</td><td class="pos">+86.1%</td></tr>
+          <tr style="background:rgba(245,158,11,0.06);"><td><strong>2026Q2</strong></td><td>2.75 亿</td><td class="pos">+18.6%</td><td>0.483 亿</td><td class="warn"><strong>+13.5%</strong></td></tr>
+        </tbody>
+      </table>
+      <ul class="insight-list" style="margin-top:12px;">
+        <li><strong>2025Q4 是爆发顶</strong>：单季营收 4.64 亿（同比 +92.4%）、扣非 0.682 亿（同比 +451.9%），直接把 2025 全年营收增速从三季报的 +12.7% 拉到 +33.8%。年报未披露单季拆分，该项大额交付的构成（前装/商飞相关 or 年末集中交付）<strong>待后续报表验证</strong>。</li>
+        <li><strong>2026Q2 明确减速</strong>：营收同比降至 +18.6%、扣非同比降至 +13.5%，环比分别 -8.0% / -21.1%；卖方归因“客户采购节奏影响”，属可解释但需证伪。</li>
+        <li><strong>趋势判读</strong>：不是转负，而是<strong>高基数下的增速回归</strong>——同比仍正增长，环比已连续走弱。10 月 28 日三季报是唯一能验证方向的节点（能否重回环比增长、扣非同比守住两位数）。</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="bento-grid">
+    <div class="card col-12">
+      <div class="card-header">
+        <div class="card-title"><span>&#128200;</span>图 1：2025Q1-2026Q2 单季营业收入与单季扣非归母净利润（亿元）</div>
+        <span class="status-pill pill-accent">手绘内联 SVG</span>
+      </div>
+      <div class="chart-wrap">
+        <svg viewBox="0 0 1000 470" width="100%" role="img" aria-label="单季营收与单季扣非归母净利">
+          <rect x="0" y="0" width="1000" height="470" fill="#111827" rx="8"/>
+          <line x1="80" y1="190" x2="980" y2="190" stroke="#2b3952" stroke-width="1"/>
+          <line x1="80" y1="150" x2="980" y2="150" stroke="#1e293b" stroke-width="1" stroke-dasharray="4 4"/>
+          <line x1="80" y1="110" x2="980" y2="110" stroke="#1e293b" stroke-width="1" stroke-dasharray="4 4"/>
+          <line x1="80" y1="70" x2="980" y2="70" stroke="#1e293b" stroke-width="1" stroke-dasharray="4 4"/>
+          <text x="80" y="30" fill="#94a3b8" font-size="13" font-weight="600">单季营业收入（亿元，左轴 0-5.0）</text>
+          <text x="72" y="194" fill="#64748b" font-size="11" text-anchor="end">0</text>
+          <text x="72" y="154" fill="#64748b" font-size="11" text-anchor="end">1.0</text>
+          <text x="72" y="114" fill="#64748b" font-size="11" text-anchor="end">2.0</text>
+          <text x="72" y="74" fill="#64748b" font-size="11" text-anchor="end">4.0</text>
+          <text x="72" y="38" fill="#64748b" font-size="11" text-anchor="end">5.0</text>
+
+          <rect x="125" y="118.6" width="60" height="71.4" fill="#334155" rx="3"/>
+          <text x="155" y="110" fill="#f43f5e" font-size="12" text-anchor="middle" font-weight="600">2.38</text>
+          <text x="155" y="96" fill="#94a3b8" font-size="10.5" text-anchor="middle">+21.3%</text>
+
+          <rect x="275" y="120.4" width="60" height="69.6" fill="#334155" rx="3"/>
+          <text x="305" y="112" fill="#f43f5e" font-size="12" text-anchor="middle" font-weight="600">2.32</text>
+          <text x="305" y="98" fill="#94a3b8" font-size="10.5" text-anchor="middle">+3.1%</text>
+
+          <rect x="425" y="105.1" width="60" height="84.9" fill="#334155" rx="3"/>
+          <text x="455" y="97" fill="#f43f5e" font-size="12" text-anchor="middle" font-weight="600">2.83</text>
+          <text x="455" y="83" fill="#94a3b8" font-size="10.5" text-anchor="middle">+14.4%</text>
+
+          <rect x="575" y="50.8" width="60" height="139.2" fill="#f43f5e" opacity="0.75" rx="3"/>
+          <text x="605" y="42" fill="#f43f5e" font-size="12.5" text-anchor="middle" font-weight="700">4.64</text>
+          <text x="605" y="28" fill="#fda4af" font-size="10.5" text-anchor="middle">+92.4%</text>
+
+          <rect x="725" y="100.6" width="60" height="89.4" fill="#38bdf8" opacity="0.8" rx="3"/>
+          <text x="755" y="92" fill="#f43f5e" font-size="12" text-anchor="middle" font-weight="600">2.98</text>
+          <text x="755" y="78" fill="#94a3b8" font-size="10.5" text-anchor="middle">+25.2%</text>
+
+          <rect x="875" y="107.5" width="60" height="82.5" fill="#f59e0b" opacity="0.8" rx="3"/>
+          <text x="905" y="99" fill="#f43f5e" font-size="12" text-anchor="middle" font-weight="600">2.75</text>
+          <text x="905" y="85" fill="#fcd34d" font-size="10.5" text-anchor="middle">+18.6%</text>
+
+          <line x1="80" y1="400" x2="980" y2="400" stroke="#2b3952" stroke-width="1"/>
+          <line x1="80" y1="325" x2="980" y2="325" stroke="#1e293b" stroke-width="1" stroke-dasharray="4 4"/>
+          <line x1="80" y1="250" x2="980" y2="250" stroke="#1e293b" stroke-width="1" stroke-dasharray="4 4"/>
+          <text x="80" y="228" fill="#94a3b8" font-size="13" font-weight="600">单季扣非归母净利润（亿元，左轴 0-0.80）</text>
+          <text x="72" y="404" fill="#64748b" font-size="11" text-anchor="end">0</text>
+          <text x="72" y="329" fill="#64748b" font-size="11" text-anchor="end">0.40</text>
+          <text x="72" y="254" fill="#64748b" font-size="11" text-anchor="end">0.80</text>
+
+          <rect x="125" y="338.3" width="60" height="61.7" fill="#334155" rx="3"/>
+          <text x="155" y="330" fill="#94a3b8" font-size="11" text-anchor="middle">0.329</text>
+          <rect x="275" y="320.1" width="60" height="79.9" fill="#334155" rx="3"/>
+          <text x="305" y="312" fill="#94a3b8" font-size="11" text-anchor="middle">0.426</text>
+          <rect x="425" y="330.6" width="60" height="69.4" fill="#334155" rx="3"/>
+          <text x="455" y="322" fill="#94a3b8" font-size="11" text-anchor="middle">0.370</text>
+          <rect x="575" y="272.1" width="60" height="127.9" fill="#f43f5e" opacity="0.75" rx="3"/>
+          <text x="605" y="264" fill="#fda4af" font-size="11.5" text-anchor="middle" font-weight="600">0.682</text>
+          <rect x="725" y="285.2" width="60" height="114.8" fill="#38bdf8" opacity="0.8" rx="3"/>
+          <text x="755" y="277" fill="#bae6fd" font-size="11.5" text-anchor="middle" font-weight="600">0.612</text>
+          <rect x="875" y="309.4" width="60" height="90.6" fill="#f59e0b" opacity="0.8" rx="3"/>
+          <text x="905" y="301" fill="#fcd34d" font-size="11.5" text-anchor="middle" font-weight="600">0.483</text>
+
+          <text x="155" y="425" fill="#94a3b8" font-size="12" text-anchor="middle">2025Q1</text>
+          <text x="305" y="425" fill="#94a3b8" font-size="12" text-anchor="middle">2025Q2</text>
+          <text x="455" y="425" fill="#94a3b8" font-size="12" text-anchor="middle">2025Q3</text>
+          <text x="605" y="425" fill="#fda4af" font-size="12" text-anchor="middle" font-weight="600">2025Q4</text>
+          <text x="755" y="425" fill="#94a3b8" font-size="12" text-anchor="middle">2026Q1</text>
+          <text x="905" y="425" fill="#fcd34d" font-size="12" text-anchor="middle" font-weight="600">2026Q2</text>
+
+          <text x="155" y="448" fill="#64748b" font-size="11" text-anchor="middle">+65.2%</text>
+          <text x="305" y="448" fill="#64748b" font-size="11" text-anchor="middle">+80.8%</text>
+          <text x="455" y="448" fill="#64748b" font-size="11" text-anchor="middle">+27.6%</text>
+          <text x="605" y="448" fill="#64748b" font-size="11" text-anchor="middle">+451.9%</text>
+          <text x="755" y="448" fill="#64748b" font-size="11" text-anchor="middle">+86.1%</text>
+          <text x="905" y="448" fill="#fcd34d" font-size="11" text-anchor="middle" font-weight="600">+13.5%</text>
+          <text x="60" y="462" fill="#475569" font-size="10.5">底行数字：单季扣非归母同比增速</text>
+        </svg>
+      </div>
+      <div class="chart-cap">数据来源：公司 2025 年报、2026 一季报与半年报（单季值由累计值轧差）</div>
+    </div>
+  </div>
+
+  <div class="bento-grid">
+    <div class="card col-7">
+      <div class="card-header">
+        <div class="card-title"><span>&#128230;</span><span>&#9314; 分产品 / 分地区拆解：故事是自研，报表仍是分销</span></div>
+        <span class="status-pill pill-warn">自研占比 9.8%</span>
+      </div>
+      <table class="bento-table">
+        <thead>
+          <tr><th>分部（2026H1）</th><th>收入</th><th>占比</th><th>同比</th><th>毛利率</th><th>毛利率同比</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>航材分销</strong></td><td>5.17 亿</td><td>90.2%</td>
+            <td class="pos">+20.64%</td><td>29.28%</td><td class="pos">+2.61pct</td>
+          </tr>
+          <tr>
+            <td><strong style="color:var(--purple);">自研自产航材</strong></td><td>0.560 亿</td><td>9.8%</td>
+            <td class="pos">+35.78%</td><td>54.17%</td><td class="neg">-1.60pct</td>
+          </tr>
+          <tr>
+            <td><strong>内销</strong></td><td>5.31 亿</td><td>92.6%</td><td class="pos">+24.49%</td><td colspan="2">主力市场，自研与分销均以国内航司/商飞为终端</td>
+          </tr>
+          <tr>
+            <td><strong>外销</strong></td><td>0.427 亿</td><td>7.4%</td><td class="neg">-2.57%</td><td colspan="2">东南亚等区域，本期小幅收缩，非主要变量</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="note-box">
+        <strong style="color:var(--text-main);">2025 全年对照（同口径）</strong>：分销 11.25 亿元（占比 92.49%，同比 +33.79%）、自研 0.913 亿元（占比 7.51%，同比 +33.96%，毛利率 55.83%）。
+        自研收入占比由全年 7.5% 提升至 2026H1 的 <strong>9.8%</strong>，是本期整体毛利率抬升约一半的来源（自研毛利率约为分销的 1.85 倍）。
+      </div>
+      <ul class="insight-list" style="margin-top:12px;">
+        <li><strong>结构真相</strong>：市场按“航材国产替代 + 对标 HEICO”定价，但报表里 <strong>90% 的收入仍是低毛利分销</strong>——本质是取得欧美原厂授权后的买断式进口代理与渠道服务，赚的是渠道与服务费，不是制造溢价。</li>
+        <li><strong>自研的含金量</strong>：累计 3,500+ 件号通过民航局适航审定（2025 年末 3,200+，半年新增约 300），产品以高分子材料、胶带胶膜、航电气瓶、客/货舱零部件等<strong>等效替换类材料</strong>为主，惠州/赣州自产（精细化工、胶带胶膜），其余委外。研发费用仅 728 万元（占收入 1.27%）——这是“材料工程 + 取证”生意，不是底层研发驱动。</li>
+        <li><strong>行业贝塔交叉验证</strong>：C919 已累计开通 58 条航线、通航 26 座城市、载客超 750 万人次，2026-08-12 开启国际定期商业航线；2025 年商飞交付三大航 15 架，2026 年三大航计划引进 33 架——<strong>前装航材需求进入翻倍级放量</strong>，分销与自研共同受益，公司部分自研产品已进入中国商飞工艺材料产品目录。</li>
+        <li><strong>双重暴露的硬币两面</strong>：分销依赖欧美原厂授权与进口（关税、汇率、上游涨价、授权稳定性均为风险）；自研直接受益国产化率提升。外部环境越对抗，自研逻辑越强、分销成本压力越大。</li>
+      </ul>
+    </div>
+
+    <div class="card col-5">
+      <div class="card-header">
+        <div class="card-title"><span>&#128202;</span><span>&#9315; 毛利率与费用结构：策略落地，但含激励成本自然衰减</span></div>
+        <span class="status-pill pill-good">毛销差 +4.02pct</span>
+      </div>
+      <div class="chart-wrap">
+        <svg viewBox="0 0 520 200" width="100%" role="img" aria-label="分部毛利率与期间费用率对比">
+          <rect x="0" y="0" width="520" height="200" fill="#111827" rx="8"/>
+          <text x="16" y="24" fill="#94a3b8" font-size="12" font-weight="600">分部毛利率对比（2026H1）</text>
+          <text x="16" y="52" fill="#cbd5e1" font-size="11">分销 29.28%</text>
+          <rect x="120" y="40" width="300" height="14" fill="#1e293b" rx="7"/>
+          <rect x="120" y="40" width="162" height="14" fill="#38bdf8" opacity="0.85" rx="7"/>
+          <text x="292" y="52" fill="#bae6fd" font-size="11">+2.61pct</text>
+          <text x="16" y="84" fill="#cbd5e1" font-size="11">自研 54.17%</text>
+          <rect x="120" y="72" width="300" height="14" fill="#1e293b" rx="7"/>
+          <rect x="120" y="72" width="300" height="14" fill="#a855f7" opacity="0.85" rx="7"/>
+          <text x="430" y="84" fill="#d8b4fe" font-size="11">-1.60pct</text>
+
+          <text x="16" y="122" fill="#94a3b8" font-size="12" font-weight="600">期间费用率同比（2026H1 vs 2025H1）</text>
+          <text x="16" y="146" fill="#64748b" font-size="10.5">销售 5.77% → 4.22%</text>
+          <rect x="170" y="136" width="130" height="10" fill="#334155" rx="5"/>
+          <rect x="170" y="150" width="95" height="10" fill="#10b981" opacity="0.8" rx="5"/>
+          <text x="16" y="176" fill="#64748b" font-size="10.5">研发 1.66% → 1.27%</text>
+          <rect x="170" y="166" width="130" height="10" fill="#334155" rx="5"/>
+          <rect x="170" y="180" width="100" height="10" fill="#10b981" opacity="0.8" rx="5"/>
+          <text x="320" y="146" fill="#a7f3d0" font-size="10.5">管理费用率 3.59% → 3.34%</text>
+          <text x="320" y="176" fill="#fcd34d" font-size="10.5">财务费用率 -2.49% → -1.62%（净收益收窄）</text>
+        </svg>
+      </div>
+      <table class="bento-table">
+        <thead><tr><th>指标</th><th>2026H1</th><th>2025H1</th><th>变动</th></tr></thead>
+        <tbody>
+          <tr><td>综合毛利率</td><td><strong>31.71%</strong></td><td>29.23%</td><td class="pos">+2.48pct</td></tr>
+          <tr><td>销售费用率</td><td>4.22%</td><td>5.77%</td><td class="pos">-1.55pct</td></tr>
+          <tr><td>管理费用率</td><td>3.34%</td><td>3.59%</td><td class="pos">-0.26pct</td></tr>
+          <tr><td>研发费用率</td><td>1.27%</td><td>1.66%</td><td class="pos">-0.39pct</td></tr>
+          <tr><td>财务费用率</td><td>-1.62%</td><td>-2.49%</td><td class="neg">+0.88pct</td></tr>
+          <tr><td>期间费用率合计</td><td><strong>7.21%</strong></td><td>8.53%</td><td class="pos">-1.32pct</td></tr>
+          <tr><td>毛销差</td><td><strong>27.49%</strong></td><td>23.47%</td><td class="pos">+4.02pct</td></tr>
+          <tr><td>销售净利率</td><td><strong>19.43%</strong></td><td>16.33%</td><td class="pos">+3.10pct</td></tr>
+        </tbody>
+      </table>
+      <div class="note-box">
+        <strong style="color:var(--text-main);">判读</strong>：毛利率升 + 期间费用率降 = 框架中的“策略落地”正组合，毛销差扩张 4pct、净利率提升 3.1pct，经营杠杆真实释放。
+        但两项需打折：<strong>销售费用下降来自业务招待费与股份支付减少、研发费用下降源于股份支付</strong>（激励成本随计划到期自然衰减，非永久性降本）；
+        另外财务费用净收益因理财结构变化收窄 0.88pct，部分对冲了费用端的改善。净利率跳升中约 1/4 来自“理财利息 + 激励成本衰减”这类非经营因素。
+      </div>
+    </div>
+  </div>
+
+  <div class="bento-grid">
+    <div class="card col-7">
+      <div class="card-header">
+        <div class="card-title"><span>&#127974;</span><span>&#9316; 资产负债表体检：三层覆盖率下的“厚垫”，但 Q2 现金流与存货需盯住</span></div>
+        <span class="status-pill pill-accent">有息覆盖 14.0x</span>
+      </div>
+      <div class="chart-wrap">
+        <svg viewBox="0 0 720 180" width="100%" role="img" aria-label="类现金与负债分层">
+          <rect x="0" y="0" width="720" height="180" fill="#111827" rx="8"/>
+          <text x="16" y="22" fill="#94a3b8" font-size="12" font-weight="600">类现金 8.30 亿元的对应关系（横向条形按比例，2026-06-30 口径）</text>
+          <text x="16" y="52" fill="#e2e8f0" font-size="11.5">类现金 8.30 亿</text>
+          <rect x="150" y="40" width="520" height="16" fill="#38bdf8" opacity="0.85" rx="8"/>
+          <text x="16" y="88" fill="#cbd5e1" font-size="11.5">有息负债 0.59 亿</text>
+          <rect x="150" y="76" width="37" height="16" fill="#f43f5e" opacity="0.85" rx="8"/>
+          <text x="196" y="89" fill="#fda4af" font-size="11">覆盖率 14.0x（不违约风险）</text>
+          <text x="16" y="124" fill="#cbd5e1" font-size="11.5">流动负债 2.32 亿</text>
+          <rect x="150" y="112" width="145" height="16" fill="#f59e0b" opacity="0.85" rx="8"/>
+          <text x="304" y="125" fill="#fcd34d" font-size="11">覆盖率 3.58x（经营性即期清偿垫充裕）</text>
+          <text x="16" y="160" fill="#cbd5e1" font-size="11.5">总负债 2.36 亿</text>
+          <rect x="150" y="148" width="148" height="16" fill="#a855f7" opacity="0.85" rx="8"/>
+          <text x="307" y="161" fill="#d8b4fe" font-size="11">覆盖率 3.52x</text>
+        </svg>
+      </div>
+      <table class="bento-table">
+        <thead><tr><th>体检项</th><th>2026-06-30</th><th>判读</th></tr></thead>
+        <tbody>
+          <tr><td>类现金（货币 + 交易性金融资产）</td><td><strong>8.30 亿</strong>（1.59 + 6.71）</td><td>8.3 亿约占市值 19.2%，净现金 7.71 亿占市值 17.9%</td></tr>
+          <tr><td>有息负债 / 资产负债率</td><td>0.593 亿 / 14.78%</td><td>短期借款 0.423 亿，长期借款为 0；流动比率 6.22、速动 5.00</td></tr>
+          <tr><td>商誉</td><td>0（2024 年尚有 923 万）</td><td>无并购商誉减值风险</td></tr>
+          <tr><td>经营现金流 / 净利润（H1）</td><td>1.194 亿 / 1.119 亿 = <strong>106.7%</strong></td><td>TTM 112.7%、2025 全年 120.3%、2024 全年 52.3% → 现金含量持续改善</td></tr>
+          <tr style="background:rgba(245,158,11,0.06);"><td><strong>Q2 单季经营现金流</strong></td><td class="neg"><strong>-0.746 亿</strong></td><td>H1 的 1.194 亿几乎全部来自 Q1 的 1.940 亿，Q2 净流出</td></tr>
+          <tr style="background:rgba(245,158,11,0.06);"><td><strong>存货 / 应收账款</strong></td><td>2.824 亿（较期初 +34.8%）/ 2.881 亿（较期初 -27.5%）</td><td>存货大增（主动备货）并计提跌价准备 611 万元；应收周转天数约 80 天（期初约 119 天）</td></tr>
+        </tbody>
+      </table>
+      <div class="note-box">
+        <strong style="color:var(--text-main);">判读</strong>：资产端是这家公司最硬的部分——三层覆盖率分别为 14.0x / 3.58x / 3.52x，即便按“全部流动负债”这一最严口径，现金垫仍绰绰有余，与苏泊尔（类现金≈有息负债 1:1、流动覆盖率约 35%）完全不是一个级别。
+        2026-08-23 公司同时<strong>终止并撤回 4.3 亿元可转债发行申请</strong>，侧面印证外部融资已无必要。
+        <br><strong>但两点不能回避</strong>：① Q2 单季经营现金流为负（-0.746 亿元），与 H1 的“亮眼 1.19 亿”形成鲜明反差；② 存货较期初 +34.8% 至 2.82 亿元，同时计提跌价 611 万元。
+        这两项究竟是“为 H2 大额交付提前备货”（对应 2025 年 H2 与 Q4 的季节性放大），还是“需求走弱下的周转积压”，<strong>必须用三季报验证，不宜先行定性</strong>——按框架要求，不做“纯属时点错配/主动备货无风险”式的主观推定。
+      </div>
+    </div>
+
+    <div class="card col-5">
+      <div class="card-header">
+        <div class="card-title"><span>&#128176;</span><span>&#9317; 股东回报 + 新增长点 + 周期位置</span></div>
+        <span class="status-pill pill-warn">增速验证期</span>
+      </div>
+
+      <div style="background:var(--surface);padding:12px;border-radius:var(--radius-sm);margin-bottom:12px;">
+        <div style="font-size:12px;color:var(--text-muted);display:flex;justify-content:space-between;">
+          <span>52 周区间位置（前复权）</span><span class="warn">23.1% 分位</span>
+        </div>
+        <div style="position:relative;height:34px;margin-top:6px;">
+          <div style="position:absolute;left:0;right:0;top:12px;height:6px;background:linear-gradient(90deg,var(--down),var(--warn),var(--up));border-radius:999px;opacity:0.5;"></div>
+          <div style="position:absolute;left:23.1%;top:2px;width:2px;height:26px;background:var(--accent);"></div>
+          <div style="position:absolute;left:23.1%;top:26px;font-size:11px;color:var(--accent);transform:translateX(-50%);">26.77</div>
+        </div>
+        <div style="font-size:11px;color:var(--text-dim);display:flex;justify-content:space-between;margin-top:8px;">
+          <span>低 21.35</span><span>距 5 月高点回撤 -40.2%</span><span>高 44.79</span>
+        </div>
+      </div>
+
+      <table class="bento-table">
+        <thead><tr><th>分红指标</th><th>数值</th><th>口径说明</th></tr></thead>
+        <tbody>
+          <tr><td>TTM 股息率</td><td><strong>2.47%</strong></td><td>近 12 个月已除权派现 1.066 亿元 / 市值 43.14 亿元</td></tr>
+          <tr><td>2025 会计年度派息率</td><td><strong>49.1%</strong></td><td>中期 0.4007 亿 + 年度 0.5019 亿 = 0.9026 亿 / 归母 1.8388 亿</td></tr>
+          <tr><td>2026 中期派息率</td><td><strong>50.4%</strong></td><td>10 派 3.5 元（0.5641 亿元），2026-09-04 已除权实施</td></tr>
+          <tr><td>近三年累计分红率</td><td>47.5%</td><td>累计 1.73 亿元（第三方口径）</td></tr>
+          <tr><td>股本变动</td><td>0.823 → 1.151 → 1.612 亿股</td><td>连续两年“10 转 4”（2024、2025 年度），转增不改价值但改变 EPS 序列</td></tr>
+        </tbody>
+      </table>
+
+      <div class="note-box">
+        <strong style="color:var(--text-main);">卖方目标价现算（基准：2026-10-09 收盘 26.77 元）</strong><br>
+        &bull; 机构一致预期目标价 39.64 元 → <strong class="pos">+48.08%</strong>；对应 2026E 净利 2.33 亿 / EPS 1.44 元（18.55x）、2027E 3.04 亿（14.21x）、2028E 3.92 亿（10.99x）<br>
+        &bull; 华泰证券 40.10 元（2026-07-20，买入）→ <strong class="pos">+49.79%</strong>；西南证券 42.00 元（2025-11-14）→ +56.89%；国投证券 42.28 元（2025-09-02）→ +57.94%<br>
+        &bull; <strong class="warn">口径提示</strong>：一致预期隐含 2026H2 营收同比约 +47%、而 H2 净利率降至约 12.7%，与 H1 毛利率改善方向存在张力，且样本机构与更新时间有限，仅作市场预期差参照，<strong>不作为低估依据</strong>。
+      </div>
+
+      <div class="note-box">
+        <strong style="color:var(--text-main);">筹码与事件日历</strong><br>
+        &bull; <strong>减持窗口进行中</strong>：2026-09-17 至 12-16，董事/高管徐烁华（不超 0.50%）、高木锐（0.09%）及 18 名自然人股东（0.48%）合计不超 <strong>1.07%</strong>；已实施约 86 万股，成交均价 27.4-29.0 元。此前 2026-05-13 实控人刘俊锋减持 100.94 万股（均价 61.01 元，转增前），2026-04-15 曾出现 45.25 元、折价 7.01% 的大宗交易。<br>
+        &bull; 股东户数由 8-20 的 13,893 户增至 9-20 的 <strong>15,850 户（+14.09%）</strong>，筹码分散化，与股价回落阶段特征一致。<br>
+        &bull; 2026-09-24 控股股东内部股权调整：刘俊锋将嘉仑投资 19% 股权转让给配偶张奇志（刘 61% / 张 29%），属家族安排，非二级市场减持；控股股东持股 9,582 万股（约 59.5%），<strong>无股权质押</strong>。<br>
+        &bull; <strong>2026-10-14</strong> 临时股东会股权登记日；<strong>2026-10-19</strong> 临时股东会（回购注销 8.63 万股限制性股票 @7.79 元、变更注册资本）；<strong>2026-10-28</strong> 三季报预约披露（核心验证节点）。
+      </div>
+    </div>
+  </div>
+
+  <div class="bento-grid">
+    <div class="card col-12">
+      <div class="card-header">
+        <div class="card-title"><span>&#127919;</span>总判定：干净利润表 + 极厚资产负债表 + 尚未兑现的成长结构</div>
+        <span class="status-pill pill-warn">高增长后的验证期</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin-bottom:14px;">
+        <div style="background:var(--surface);padding:14px;border-radius:var(--radius-sm);border-left:3px solid var(--down);">
+          <div style="font-size:12px;color:var(--text-dim);margin-bottom:6px;">最像分众的地方</div>
+          <div style="font-size:12.5px;color:var(--text-muted);">利润表干净（归母与扣非差异仅 2.1%）、资产负债表极厚（类现金/有息负债 14.0x，流动覆盖率 3.58x，零商誉无质押）、派息率稳定在 50% 左右且分红由厚现金与当期现金流双支撑。</div>
+        </div>
+        <div style="background:var(--surface);padding:14px;border-radius:var(--radius-sm);border-left:3px solid var(--warn);">
+          <div style="font-size:12px;color:var(--text-dim);margin-bottom:6px;">最不像分众的地方</div>
+          <div style="font-size:12.5px;color:var(--text-muted);">分众是“减收、增利、增现金”的存量龙头，靠躺着的大额存量现金分红；润贝是“增收增利”的成长标的，但 <strong>90% 收入仍来自低毛利分销（代理贸易属性）</strong>，自研占比不足 10%——<strong>故事是 HEICO，报表仍偏代理商</strong>。</div>
+        </div>
+        <div style="background:var(--surface);padding:14px;border-radius:var(--radius-sm);border-left:3px solid var(--accent);">
+          <div style="font-size:12px;color:var(--text-dim);margin-bottom:6px;">周期位置</div>
+          <div style="font-size:12.5px;color:var(--text-muted);">不是底部左侧（业绩仍在增长），也不是确认拐点（Q2 环比已走弱）。属<strong>高增长后的增速验证期</strong>：股价已提前回撤 40.2%，PE(TTM) 19.75x 消化了大部分成长溢价，但真正的方向要等 10-28 三季报。</div>
+        </div>
+      </div>
+      <table class="bento-table">
+        <thead><tr><th>跟踪信号</th><th>当前状态</th><th>验证节点</th><th>信号含义</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>① 单季扣非同比与环比</strong></td><td>Q1 +86.1% → Q2 +13.5%（环比 -21.1%）</td><td>2026-10-28 三季报</td>
+            <td>若 H2 重回环比增长、扣非同比守住两位数 → 采购节奏扰动；若跌破个位数或转负 → 成长叙事进入证伪阶段</td>
+          </tr>
+          <tr>
+            <td><strong>② 存货与经营现金流</strong></td><td>存货 2.82 亿（+34.8%）；Q2 单季经营现金流 -0.746 亿</td><td>三季报存货、现金流科目</td>
+            <td>存货转为收入 + 现金流回正 = 备货前置；存货继续堆积 + 现金流持续为负 = 周转走弱</td>
+          </tr>
+          <tr>
+            <td><strong>③ 自研占比与毛利率</strong></td><td>自研占比 9.8%（2025 全年 7.5%），毛利率 54.17%（同比 -1.60pct）</td><td>三季报分部收入</td>
+            <td>占比向 12-15% 抬升且毛利率企稳 = 结构升级兑现；以价换量导致毛利率继续下滑则“自研溢价”打折</td>
+          </tr>
+          <tr>
+            <td><strong>④ 减持窗口筹码压力</strong></td><td>1.07% 减持计划执行中（截至 12-16）</td><td>逐笔权益变动公告</td>
+            <td>减持量级有限但压制情绪，需与三季报节奏叠加观察</td>
+          </tr>
+          <tr>
+            <td><strong>⑤ 外部变量</strong></td><td>上游供应商涨价、关税与汇率、原厂授权稳定性、存货跌价</td><td>持续</td>
+            <td>分销端成本冲击与自研端国产替代加速，是同一枚硬币的两面</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="note-box" style="margin-top:14px;">
+        <strong style="color:var(--text-main);">一句话结论</strong>：润贝航科是一家<strong>资产质量过硬、报表干净、分红体面</strong>的航材国产化标的，但当前报表结构（90% 分销、1.27% 研发强度）与市场赋予的“高端制造/HEICO 式”成长叙事之间仍有落差；2025Q4-2026Q1 的高增长斜率已在 Q2 明显回落，估值与股价则先行回撤 40%。
+        因此它的关键词不是“深度低估”，而是<strong>“成长的验证”</strong>——三季报之前，最值得盯的是扣非同比的方向、存货与现金流的组合，以及自研占比抬升的斜率。
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <span class="disclaimer-badge">免责声明</span>
+    <p>
+      本报告为按《分众传媒没有那么不堪》六维方法论的财报数据推演，所有数据来自公司公开披露（2026 年半年度报告、2025 年年度报告、2026 年一至二季度公告）、交易所公开行情与公开媒体报道；
+      行情与估值指标基准为 <strong>2026-10-09 收盘确认值</strong>（10 月 10-11 日为周末休市）。分部数据均为 2026H1 同期间口径，2025 全年数据已单独标注。
+      本报告<strong>不构成任何投资建议</strong>，不构成买卖要约；卖方目标价系相关机构基于其自身假设的判断，不代表任何确定性。
+      生成时间：2026-10-11 · 六维基本面模型 v1.0
+    </p>
+  </footer>
+</div>
+
+</body>
+</html>
